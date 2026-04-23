@@ -5,9 +5,28 @@ import android.view.accessibility.AccessibilityEvent
 
 class AppAccessibilityService : AccessibilityService() {
 
+    private var lastPkg: String? = null
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val pkg = event?.packageName?.toString() ?: return
-        AppMonitor.startTimer(this, pkg)
+        if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+
+        val pkg = event.packageName?.toString() ?: return
+
+        // 🔥 ignore OUR OWN APP (overlay triggers this)
+        if (pkg == "com.appblocker") return
+
+        // 🔥 ignore duplicate events
+        if (pkg == lastPkg) return
+        lastPkg = pkg
+
+        // 🔥 user left app → remove overlay
+        if (pkg.contains("systemui") || pkg.contains("launcher")) {
+            OverlayService.hide()
+            AppMonitor.onAppExit()
+            return
+        }
+
+        AppMonitor.handleAppChange(this, pkg)
     }
 
     override fun onInterrupt() {}

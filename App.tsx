@@ -29,6 +29,8 @@ export default function App() {
   const [timers, setTimers] = useState<{ [key: string]: number }>({});
   const [unlocked, setUnlocked] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [iosTimer, setIosTimer] = useState<number>(1);
+  const [iosDifficulty, setIosDifficulty] = useState<string>('Easy');
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -91,7 +93,7 @@ export default function App() {
 
       Alert.alert('Saved Successfully with timer');
     } else {
-      AppService.startBlocking(10);
+      AppService.startBlocking(iosTimer * 60, iosDifficulty);
       Alert.alert('Blocking Started');
     }
   };
@@ -235,6 +237,34 @@ export default function App() {
           <Text style={styles.iosText}>
             Apps are selected using iOS system picker
           </Text>
+
+          <View style={{ marginTop: 30, width: '100%', alignItems: 'center' }}>
+            <Text style={styles.timerTitle}>Select Math Difficulty</Text>
+            <View style={[styles.timerRow, { justifyContent: 'center' }]}>
+              {['Easy', 'Medium', 'Hard'].map(d => (
+                <TouchableOpacity
+                  key={d}
+                  style={[styles.timerBtn, iosDifficulty === d && styles.timerActive]}
+                  onPress={() => setIosDifficulty(d)}
+                >
+                  <Text style={[styles.timerText, iosDifficulty === d && styles.timerTextActive]}>{d}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={[styles.timerTitle, { marginTop: 20 }]}>Select Session Timer</Text>
+            <View style={[styles.timerRow, { justifyContent: 'center' }]}>
+              {[1, 5, 10, 15, 30, 60].map(t => (
+                <TouchableOpacity
+                  key={t}
+                  style={[styles.timerBtn, iosTimer === t && styles.timerActive]}
+                  onPress={() => setIosTimer(t)}
+                >
+                  <Text style={[styles.timerText, iosTimer === t && styles.timerTextActive]}>{t}m</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -245,7 +275,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0d0d0d',
     paddingHorizontal: 16,
-    // paddingTop: 40,
+    paddingTop: 40,
   },
 
   title: {

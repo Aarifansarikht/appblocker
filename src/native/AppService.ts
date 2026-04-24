@@ -53,8 +53,9 @@ const AppService = {
   },
 
   // 🚀 START BLOCKING (IOS SESSION TIMER)
-  startBlocking: (time: number) => {
+  startBlocking: (time: number, difficulty: string = 'Easy') => {
     if (isIOS && ScreenTimeManager) {
+      ScreenTimeManager.setDifficulty(difficulty);
       ScreenTimeManager.startMonitoring(time);
     }
   },

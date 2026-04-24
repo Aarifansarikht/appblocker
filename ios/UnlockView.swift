@@ -1,66 +1,81 @@
-//
-//  UnlockView.swift
-//  appblocker
-//
-//  Created by Arun Saini on 24/04/26.
-//
-
 import SwiftUI
-import FamilyControls // For selection types
-import ManagedSettings // <--- ADD THIS LINE
+import ManagedSettings
 
 struct UnlockView: View {
-    @State var a = Int.random(in: 1...10)
-    @State var b = Int.random(in: 1...10)
+
+    @State var a = 0
+    @State var b = 0
+    @State var op = "+"
+    @State var correctAns = 0
+    @State var options: [Int] = []
     
-    // 1. Add the dismiss environment
+    let difficulty = UserDefaults.standard.string(forKey: "math_difficulty") ?? "Easy"
+    
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             Text("Solve to Unlock")
                 .font(.headline)
 
-            Text("\(a) + \(b) = ?")
-                .font(.system(size: 50, weight: .bold))
+            Text("\(a) \(op) \(b) = ?")
+                .font(.largeTitle)
+                .padding()
 
-            ForEach(generateOptions(), id: \.self) { opt in
+            ForEach(options, id: \.self) { opt in
                 Button(action: {
-                    checkAnswer(opt)
+                    if opt == correctAns {
+                        let store = ManagedSettingsStore()
+                        store.shield.applications = nil
+                        store.shield.applicationCategories = nil
+                        dismiss()
+                    } else {
+                        generateMath()
+                    }
                 }) {
                     Text("\(opt)")
-                        .frame(width: 200)
+                        .frame(minWidth: 100)
                         .padding()
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(10)
+                        .background(Color.black)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
+                .padding(.bottom, 5)
             }
         }
+        .onAppear {
+            generateMath()
+        }
     }
 
-    func checkAnswer(_ opt: Int) {
-        if opt == a + b {
-            // 2. Clear the shield directly here
-            let store = ManagedSettingsStore()
-            store.shield.applications = nil
-            store.shield.applicationCategories = nil
-            
-            // 3. Close this screen
-            dismiss()
+    func generateMath() {
+        if difficulty == "Easy" {
+            a = Int.random(in: 1...20)
+            b = Int.random(in: 1...20)
+            correctAns = a + b
+            op = "+"
+        } else if difficulty == "Medium" {
+            let isSub = Bool.random()
+            a = Int.random(in: 10...100)
+            b = Int.random(in: 10...100)
+            if isSub {
+                if a < b { swap(&a, &b) }
+                correctAns = a - b
+                op = "-"
+            } else {
+                correctAns = a + b
+                op = "+"
+            }
         } else {
-            // Wrong answer - reset puzzle
-            a = Int.random(in: 1...10)
-            b = Int.random(in: 1...10)
+            a = Int.random(in: 10...40)
+            b = Int.random(in: 2...10)
+            correctAns = a * b
+            op = "×"
         }
-    }
-
-    func generateOptions() -> [Int] {
-        let correct = a + b
-        // Use a Set to ensure all 3 options are unique
-        var options = Set<Int>([correct, correct + 1, correct - 1])
-        while options.count < 3 {
-            options.insert(Int.random(in: 2...20))
-        }
-        return Array(options).shuffled()
+        
+        let wrong1 = correctAns + Int.random(in: 1...10)
+        let wrong2 = correctAns - Int.random(in: 1...5)
+        
+        options = [correctAns, wrong1, wrong2].shuffled()
     }
 }

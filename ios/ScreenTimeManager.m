@@ -15,5 +15,6 @@ RCT_EXTERN_METHOD(openAppPicker)
 RCT_EXTERN_METHOD(startMonitoring:(nonnull NSNumber *)seconds)
 RCT_EXTERN_METHOD(unlockApps)
 RCT_EXTERN_METHOD(openUnlockScreen)
+RCT_EXTERN_METHOD(setDifficulty:(NSString *)level)
 
 @end

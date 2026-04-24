@@ -1,10 +1,3 @@
-//
-//  ScreenTimeManager.swift
-//  appblocker
-//
-//  Created by Arun Saini on 24/04/26.
-//
-
 import Foundation
 import FamilyControls
 import DeviceActivity
@@ -25,34 +18,26 @@ class ScreenTimeManager: NSObject {
     }
 
     // 🔐 Permission
-  @objc func requestPermission() {
-          Task {
-              do {
-                if #available(iOS 16.0, *) {
-                  try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-                } else {
-                  // Fallback on earlier versions
-                }
-              } catch {
-                  print("Failed to authorize: \(error)")
-              }
+    @objc
+    func requestPermission() {
+        Task {
+          if #available(iOS 16.0, *) {
+            try? await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+          } else {
+            // Fallback on earlier versions
           }
-      }
-
-    // 📱 Picker
-@objc func openAppPicker() {
-    DispatchQueue.main.async {
-        let picker = AppPickerView()
-        let vc = UIHostingController(rootView: picker)
-        
-        // Ensures the picker looks like a native iOS modal
-        vc.modalPresentationStyle = .pageSheet 
-        
-        if let rootVC = UIApplication.shared.windows.first?.rootViewController {
-            rootVC.present(vc, animated: true)
         }
     }
-}
+
+    // 📱 Picker
+    @objc
+    func openAppPicker() {
+        DispatchQueue.main.async {
+            let vc = UIHostingController(rootView: AppPickerView())
+            UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+        }
+    }
+
     // 🚀 START TIMER SESSION
     @objc
     func startMonitoring(_ seconds: NSNumber) {
@@ -77,31 +62,22 @@ class ScreenTimeManager: NSObject {
         )
     }
 
-  @objc func unlockApps() {
-          // Direct unlock from JS
-          store.shield.applications = nil
-          store.shield.applicationCategories = nil
-      }
+    // ⚙️ Save Difficulty
+    @objc
+    func setDifficulty(_ level: String) {
+        UserDefaults.standard.set(level, forKey: "math_difficulty")
+    }
 
-      @objc func openUnlockScreen() {
-          DispatchQueue.main.async {
-              let vc = UIHostingController(rootView: UnlockView())
-              
-              // USE THIS HELPER instead of windows.first
-              if let topController = self.getTopViewController() {
-                  // Allows the puzzle to slide up over the current screen
-                  vc.modalPresentationStyle = .fullScreen
-                  topController.present(vc, animated: true)
-              }
-          }
-      }
-
-      // Critical helper for React Native apps with multiple modals
-      private func getTopViewController() -> UIViewController? {
-          var topController = UIApplication.shared.windows.first?.rootViewController
-          while let presented = topController?.presentedViewController {
-              topController = presented
-          }
-          return topController
-      }
+    // 🔓 Unlock
+    @objc
+    func unlockApps() {
+        store.shield.applications = nil
+    }
+    @objc
+func openUnlockScreen() {
+    DispatchQueue.main.async {
+        let vc = UIHostingController(rootView: UnlockView())
+        UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+    }
+}
 }

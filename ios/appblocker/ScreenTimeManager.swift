@@ -5,7 +5,7 @@ import ManagedSettings
 import SwiftUI
 
 @objc(ScreenTimeManager)
-class ScreenTimeManager: NSObject, RCTBridgeModule {
+class ScreenTimeManager: NSObject {
 
     let store = ManagedSettingsStore()
 

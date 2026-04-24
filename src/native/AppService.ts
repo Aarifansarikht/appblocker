@@ -10,6 +10,7 @@ const isAndroid = Platform.OS === 'android';
 const AppService = {
   // 🔐 PERMISSIONS
   requestPermission: () => {
+    console.log('Requesting permissions...', { isIOS, isAndroid, ScreenTimeManager });
     if (isAndroid) {
       AppLocker.openAccessibilitySettings();
 

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import AppService from './src/native/AppService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AppType = {
   name: string;
@@ -106,7 +107,7 @@ export default function App() {
     const isUnlocked = unlocked.includes(item.package);
 
     return (
-      <View style={styles.card}>
+      <SafeAreaView style={styles.card}>
         <TouchableOpacity onPress={() => toggleApp(item.package)}>
           <View style={styles.row}>
             <Text style={styles.checkbox}>
@@ -167,12 +168,12 @@ export default function App() {
             </TouchableOpacity>
           </View>
         )}
-      </View>
+      </SafeAreaView>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <Text style={styles.title}>APP LOCKER</Text>
@@ -210,6 +211,11 @@ export default function App() {
             {Platform.OS === 'android' ? 'Save' : 'Start'}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.saveBtn} onPress={AppService.openUnlockScreen}>
+          <Text style={styles.saveText}>
+            {Platform.OS === 'android' ? 'Save' : 'Unlock'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -231,7 +237,7 @@ export default function App() {
           </Text>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -239,7 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0d0d0d',
     paddingHorizontal: 16,
-    paddingTop: 40,
+    // paddingTop: 40,
   },
 
   title: {

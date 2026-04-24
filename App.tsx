@@ -10,16 +10,17 @@ import {
   ActivityIndicator,
   NativeEventEmitter,
   NativeModules,
+  Platform,
 } from 'react-native';
 
-import AppLocker from './src/native/AppLocker';
+import AppService from './src/native/AppService';
 
 type AppType = {
   name: string;
   package: string;
 };
 
-const TIMER_OPTIONS = [10, 20, 30, 60, 120];
+const TIMER_OPTIONS = [5, 10, 20, 30, 60, 120];
 
 export default function App() {
   const [apps, setApps] = useState<AppType[]>([]);
@@ -29,22 +30,25 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadApps();
+    if (Platform.OS === 'android') {
+      loadApps();
 
-    // ✅ listen for native unlock event
-    const emitter = new NativeEventEmitter(NativeModules.AppLocker);
+      const emitter = new NativeEventEmitter(NativeModules.AppLocker);
 
-    const sub = emitter.addListener('APP_UNLOCKED', (pkg) => {
-      setUnlocked(prev => [...new Set([...prev, pkg])]);
-    });
+      const sub = emitter.addListener('APP_UNLOCKED', (pkg) => {
+        setUnlocked(prev => [...new Set([...prev, pkg])]);
+      });
 
-    return () => sub.remove();
+      return () => sub.remove();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const loadApps = async () => {
     try {
       setLoading(true);
-      const data = await AppLocker.getInstalledApps();
+      const data = await AppService.getApps();
       setApps(data);
     } catch (e) {
       console.log(e);
@@ -63,21 +67,36 @@ export default function App() {
 
   const setTimer = (pkg: string, time: number) => {
     setTimers(prev => ({ ...prev, [pkg]: time }));
+
+    if (Platform.OS === 'android') {
+      AppService.setTimer(pkg, time); // ✅ IMPORTANT
+    }
   };
 
   const saveApps = () => {
-    AppLocker.saveLockedApps(selected);
+    if (Platform.OS === 'android') {
+      if (selected.length === 0) {
+        Alert.alert('Select at least one app');
+        return;
+      }
 
-    selected.forEach(pkg => {
-      const time = timers[pkg] || 60;
-      AppLocker.setAppTimer(pkg, time);
-    });
+      AppService.saveApps(selected);
 
-    Alert.alert('Saved Successfully');
+      // ✅ APPLY TIMER FOR EACH APP
+      selected.forEach(pkg => {
+        const time = timers[pkg] || 10; // default fallback
+        AppService.setTimer(pkg, time);
+      });
+
+      Alert.alert('Saved Successfully with timer');
+    } else {
+      AppService.startBlocking(10);
+      Alert.alert('Blocking Started');
+    }
   };
 
   const relockApp = (pkg: string) => {
-    AppLocker.relockApp(pkg);
+    AppService.relock(pkg);
     setUnlocked(prev => prev.filter(p => p !== pkg));
     Alert.alert('Relocked');
   };
@@ -86,15 +105,12 @@ export default function App() {
     const isSelected = selected.includes(item.package);
     const isUnlocked = unlocked.includes(item.package);
 
-    // ✅ FINAL STATE
-    const isLocked = isSelected && !isUnlocked;
-
     return (
-      <View style={[styles.card, isUnlocked && styles.unlockedCard]}>
+      <View style={styles.card}>
         <TouchableOpacity onPress={() => toggleApp(item.package)}>
           <View style={styles.row}>
             <Text style={styles.checkbox}>
-              {isLocked ? '☑' : '☐'}
+              {isSelected ? '☑' : '☐'}
             </Text>
 
             <Text
@@ -110,42 +126,43 @@ export default function App() {
 
         {isSelected && (
           <View style={styles.timerContainer}>
-            <Text style={styles.timerTitle}>
-              {isLocked ? 'Locked' : 'Unlocked'}
-            </Text>
+            {!isUnlocked && (
+              <>
+                <Text style={styles.timerTitle}>Select Timer</Text>
 
-            {isLocked && (
-              <View style={styles.timerRow}>
-                {TIMER_OPTIONS.map(t => (
-                  <TouchableOpacity
-                    key={t}
-                    onPress={() => setTimer(item.package, t)}
-                    style={[
-                      styles.timerBtn,
-                      timers[item.package] === t &&
-                        styles.timerActive,
-                    ]}
-                  >
-                    <Text
+                <View style={styles.timerRow}>
+                  {TIMER_OPTIONS.map(t => (
+                    <TouchableOpacity
+                      key={t}
+                      onPress={() => setTimer(item.package, t)}
                       style={[
-                        styles.timerText,
+                        styles.timerBtn,
                         timers[item.package] === t &&
-                          styles.timerTextActive,
+                          styles.timerActive,
                       ]}
                     >
-                      {t}s
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                      <Text
+                        style={[
+                          styles.timerText,
+                          timers[item.package] === t &&
+                            styles.timerTextActive,
+                        ]}
+                      >
+                        {t}s
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
             )}
 
+            {/* ✅ ALWAYS ACTIVE BUTTON */}
             <TouchableOpacity
               style={styles.relockBtn}
               onPress={() => relockApp(item.package)}
             >
               <Text style={styles.relockText}>
-                {isLocked ? 'Force Lock' : 'Relock'}
+                {isUnlocked ? 'Relock' : 'Lock Now'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -158,85 +175,100 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <Text style={styles.title}>APP BLOCKER</Text>
+      <Text style={styles.title}>APP LOCKER</Text>
 
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => AppLocker.openAccessibilitySettings()}
-        >
-          <Text style={styles.actionText}>Accessibility</Text>
-        </TouchableOpacity>
+        {Platform.OS === 'android' ? (
+          <>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => AppService.requestPermission()}
+            >
+              <Text style={styles.actionText}>Permissions</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => AppService.requestPermission()}
+            >
+              <Text style={styles.actionText}>Enable Permission</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => AppLocker.requestOverlayPermission()}
-        >
-          <Text style={styles.actionText}>Overlay</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => AppService.openAppSelector()}
+            >
+              <Text style={styles.actionText}>Select Apps</Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         <TouchableOpacity style={styles.saveBtn} onPress={saveApps}>
-          <Text style={styles.saveText}>Save</Text>
+          <Text style={styles.saveText}>
+            {Platform.OS === 'android' ? 'Save' : 'Start'}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {/* 🔥 LOADER */}
       {loading ? (
-        <View style={styles.loaderContainer}>
+        <View style={styles.loader}>
           <ActivityIndicator size="large" color="#fff" />
           <Text style={styles.loaderText}>Loading apps...</Text>
         </View>
-      ) : apps.length === 0 ? (
-        <Text style={styles.emptyText}>No apps found</Text>
-      ) : (
+      ) : Platform.OS === 'android' ? (
         <FlatList
           data={apps}
           keyExtractor={(item) => item.package}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
         />
+      ) : (
+        <View style={styles.iosContainer}>
+          <Text style={styles.iosText}>
+            Apps are selected using iOS system picker
+          </Text>
+        </View>
       )}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#0d0d0d',
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: 40,
   },
 
   title: {
     fontSize: 24,
-    color: '#FFFFFF',
-    fontWeight: '600',
-    letterSpacing: 2,
-    marginBottom: 20,
+    color: '#fff',
+    fontWeight: '700',
+    marginBottom: 16,
   },
 
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   actionBtn: {
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: '#1a1a1a',
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 8,
   },
 
   actionText: {
-    color: '#AAA',
+    color: '#fff',
     fontSize: 12,
   },
 
   saveBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -247,33 +279,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  loaderContainer: {
-    marginTop: 100,
-    alignItems: 'center',
-  },
-
-  loaderText: {
-    marginTop: 10,
-    color: '#888',
-  },
-
-  emptyText: {
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 100,
-  },
-
   card: {
-    backgroundColor: '#121212',
+    backgroundColor: '#1a1a1a',
     padding: 14,
     borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#1F1F1F',
-  },
-
-  unlockedCard: {
-    opacity: 0.4,
+    marginBottom: 12,
   },
 
   row: {
@@ -282,18 +292,18 @@ const styles = StyleSheet.create({
   },
 
   checkbox: {
-    color: '#fff',
     fontSize: 18,
     marginRight: 10,
+    color: '#fff',
   },
 
   appName: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 15,
   },
 
   unlockedText: {
-    color: '#777',
+    color: '#666',
   },
 
   timerContainer: {
@@ -301,31 +311,31 @@ const styles = StyleSheet.create({
   },
 
   timerTitle: {
-    color: '#777',
-    fontSize: 12,
+    color: '#aaa',
     marginBottom: 8,
+    fontSize: 12,
   },
 
   timerRow: {
     flexDirection: 'row',
-    marginBottom: 10,
+    flexWrap: 'wrap',
   },
 
   timerBtn: {
-    borderWidth: 1,
-    borderColor: '#333',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 20,
+    backgroundColor: '#2a2a2a',
     marginRight: 8,
+    marginBottom: 8,
   },
 
   timerActive: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#fff',
   },
 
   timerText: {
-    color: '#AAA',
+    color: '#ccc',
     fontSize: 12,
   },
 
@@ -335,14 +345,38 @@ const styles = StyleSheet.create({
   },
 
   relockBtn: {
-    borderWidth: 1,
-    borderColor: '#444',
-    paddingVertical: 8,
-    borderRadius: 6,
+    marginTop: 10,
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
 
   relockText: {
-    color: '#CCC',
+    color: '#000',
+    fontWeight: '600',
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  loaderText: {
+    color: '#777',
+    marginTop: 10,
+  },
+
+  iosContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  iosText: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

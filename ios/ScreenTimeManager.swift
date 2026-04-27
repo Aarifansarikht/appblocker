@@ -18,6 +18,7 @@ class ScreenTimeManager: NSObject {
     private var savedDuration: Int = 0
     private var isIntervalActive: Bool = false
     private let sharedDefaults = UserDefaults(suiteName: "group.com.appblocker")
+    private let appsLockedKey = "apps_are_locked"
 
     static func moduleName() -> String! {
         return "ScreenTimeManager"
@@ -131,10 +132,17 @@ class ScreenTimeManager: NSObject {
             store.shield.applicationCategories = .specific(categoryTokens)
         }
 
+        sharedDefaults?.set(!appTokens.isEmpty || !categoryTokens.isEmpty, forKey: appsLockedKey)
+
         // Send immediate notification
         sendLockNotification()
 
         print("✅ Shield applied — apps are now blocked")
+    }
+
+    @objc
+    func isAppsLocked(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        resolve(sharedDefaults?.bool(forKey: appsLockedKey) ?? false)
     }
 
     // 🔄 End background task
@@ -156,6 +164,7 @@ class ScreenTimeManager: NSObject {
     func unlockApps() {
         store.shield.applications = nil
         store.shield.applicationCategories = nil
+        sharedDefaults?.set(false, forKey: appsLockedKey)
 
         // Cancel pending block timer
         blockWorkItem?.cancel()
@@ -181,6 +190,7 @@ class ScreenTimeManager: NSObject {
         // Remove shield
         store.shield.applications = nil
         store.shield.applicationCategories = nil
+        sharedDefaults?.set(false, forKey: appsLockedKey)
 
         // Cancel pending timer
         blockWorkItem?.cancel()
@@ -200,8 +210,21 @@ class ScreenTimeManager: NSObject {
     @objc
     func openUnlockScreen() {
         DispatchQueue.main.async {
+            guard self.sharedDefaults?.bool(forKey: self.appsLockedKey) == true else {
+                return
+            }
+
+            guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else {
+                return
+            }
+
+            if rootViewController.presentedViewController?.view.accessibilityIdentifier == "UnlockView" {
+                return
+            }
+
             let vc = UIHostingController(rootView: UnlockView())
-            UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+            vc.view.accessibilityIdentifier = "UnlockView"
+            rootViewController.present(vc, animated: true)
         }
     }
 

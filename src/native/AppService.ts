@@ -68,6 +68,14 @@ const AppService = {
     // Android handled via overlay button
   },
 
+  // 🔎 LOCK STATE (IOS ONLY)
+  isAppsLocked: async () => {
+    if (isIOS && ScreenTimeManager?.isAppsLocked) {
+      return await ScreenTimeManager.isAppsLocked();
+    }
+    return false;
+  },
+
   // 🔁 RELOCK (ANDROID ONLY)
   relock: (pkg: string) => {
     if (isAndroid) {

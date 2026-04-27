@@ -39,10 +39,8 @@ struct UnlockView: View {
             ForEach(options, id: \.self) { opt in
                 Button(action: {
                     if opt == correctAns {
-                        // ✅ Correct — remove shield
-                        let store = ManagedSettingsStore()
-                        store.shield.applications = nil
-                        store.shield.applicationCategories = nil
+                        // ✅ Correct — remove shield and update shared lock state.
+                        ScreenTimeManager.shared.unlockApps()
                         dismiss()
                     } else {
                         // ❌ Wrong — regenerate question

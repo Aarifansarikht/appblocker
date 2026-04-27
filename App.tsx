@@ -11,7 +11,8 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
-  SafeAreaView
+  SafeAreaView,
+  AppState
 } from 'react-native';
 
 import AppService from './src/native/AppService';
@@ -48,6 +49,44 @@ export default function App() {
     } else {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') {
+      return;
+    }
+
+    let isCheckingLock = false;
+
+    const openUnlockIfLocked = async () => {
+      if (isCheckingLock) {
+        return;
+      }
+
+      isCheckingLock = true;
+      try {
+        const locked = await AppService.isAppsLocked();
+        setIsBlocking(locked);
+
+        if (locked) {
+          AppService.openUnlockScreen();
+        }
+      } catch (error) {
+        console.log('Failed to check iOS lock state', error);
+      } finally {
+        isCheckingLock = false;
+      }
+    };
+
+    openUnlockIfLocked();
+
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        openUnlockIfLocked();
+      }
+    });
+
+    return () => subscription.remove();
   }, []);
 
   const loadApps = async () => {

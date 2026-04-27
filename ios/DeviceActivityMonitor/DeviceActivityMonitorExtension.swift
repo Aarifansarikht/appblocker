@@ -15,6 +15,7 @@ import Foundation
 class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
     let store = ManagedSettingsStore()
+    let defaults = UserDefaults(suiteName: "group.com.appblocker")
 
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
@@ -26,8 +27,6 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         super.intervalDidEnd(for: activity)
 
         // 🔒 Timer ended — BLOCK the selected apps
-        let defaults = UserDefaults(suiteName: "group.com.appblocker")
-
         if let data = defaults?.data(forKey: "saved_family_activity_selection"),
            let selection = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) {
 
@@ -36,6 +35,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
             store.shield.applications = appTokens.isEmpty ? nil : appTokens
             store.shield.applicationCategories = categoryTokens.isEmpty ? nil : .specific(categoryTokens)
+            defaults?.set(!appTokens.isEmpty || !categoryTokens.isEmpty, forKey: "apps_are_locked")
 
             print("🔒 DeviceActivity: Shield applied — Apps: \(appTokens.count), Categories: \(categoryTokens.count)")
         } else {
@@ -47,13 +47,12 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         super.eventDidReachThreshold(event, activity: activity)
 
         // 🔒 Usage threshold reached — re-shield this app
-        let defaults = UserDefaults(suiteName: "group.com.appblocker")
-
         if let data = defaults?.data(forKey: "saved_family_activity_selection"),
            let selection = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) {
 
             store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
             store.shield.applicationCategories = selection.categoryTokens.isEmpty ? nil : .specific(selection.categoryTokens)
+            defaults?.set(!selection.applicationTokens.isEmpty || !selection.categoryTokens.isEmpty, forKey: "apps_are_locked")
 
             print("🔒 DeviceActivity: Event threshold reached — shield re-applied")
         }

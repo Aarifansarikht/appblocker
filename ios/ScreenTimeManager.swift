@@ -19,6 +19,9 @@ class ScreenTimeManager: NSObject {
     private var isIntervalActive: Bool = false
     private let sharedDefaults = UserDefaults(suiteName: "group.com.appblocker")
     private let appsLockedKey = "apps_are_locked"
+    private let timerDurationKey = "saved_timer_duration"
+    private let intervalActiveKey = "interval_blocking_active"
+    private let sessionActivityName = DeviceActivityName("session")
 
     static func moduleName() -> String! {
         return "ScreenTimeManager"
@@ -62,15 +65,23 @@ class ScreenTimeManager: NSObject {
     func startMonitoring(_ seconds: NSNumber) {
 
         let duration = seconds.intValue
+        guard duration > 0 else {
+            print("❌ Timer not started — invalid duration: \(duration)")
+            return
+        }
 
         // 💾 Save duration for interval restart
         savedDuration = duration
         isIntervalActive = true
+        sharedDefaults?.set(duration, forKey: timerDurationKey)
+        sharedDefaults?.set(true, forKey: intervalActiveKey)
 
         // ❌ Cancel any previous work
         blockWorkItem?.cancel()
         blockWorkItem = nil
         endBackgroundTask()
+        DeviceActivityCenter().stopMonitoring([sessionActivityName])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["timer_expired"])
 
         // ✅ DeviceActivity monitoring (backup if extension exists)
         let now = Date()
@@ -85,10 +96,11 @@ class ScreenTimeManager: NSObject {
             repeats: false
         )
 
-        try? DeviceActivityCenter().startMonitoring(
-            DeviceActivityName("session"),
-            during: schedule
-        )
+        do {
+            try DeviceActivityCenter().startMonitoring(sessionActivityName, during: schedule)
+        } catch {
+            print("❌ Failed to start DeviceActivity monitoring: \(error)")
+        }
 
         // 🔥 REQUEST BACKGROUND EXECUTION — keeps app alive after user switches away
         backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "AppBlockerTimer") { [weak self] in
@@ -174,9 +186,12 @@ class ScreenTimeManager: NSObject {
         print("✅ Apps unlocked — shield removed")
 
         // 🔁 AUTO-RESTART: If interval is active, start next timer cycle
-        if isIntervalActive && savedDuration > 0 {
-            print("🔁 Interval timer: Starting next cycle (\(savedDuration)s)")
-            startMonitoring(NSNumber(value: savedDuration))
+        let persistedIntervalActive = sharedDefaults?.bool(forKey: intervalActiveKey) ?? false
+        let restartDuration = savedDuration > 0 ? savedDuration : (sharedDefaults?.integer(forKey: timerDurationKey) ?? 0)
+
+        if (isIntervalActive || persistedIntervalActive) && restartDuration > 0 {
+            print("🔁 Interval timer: Starting next cycle (\(restartDuration)s)")
+            startMonitoring(NSNumber(value: restartDuration))
         }
     }
 
@@ -186,6 +201,8 @@ class ScreenTimeManager: NSObject {
         // Stop interval
         isIntervalActive = false
         savedDuration = 0
+        sharedDefaults?.set(false, forKey: intervalActiveKey)
+        sharedDefaults?.removeObject(forKey: timerDurationKey)
 
         // Remove shield
         store.shield.applications = nil
@@ -198,7 +215,7 @@ class ScreenTimeManager: NSObject {
         endBackgroundTask()
 
         // Stop DeviceActivity monitoring
-        DeviceActivityCenter().stopMonitoring()
+        DeviceActivityCenter().stopMonitoring([sessionActivityName])
 
         // Cancel pending notifications
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["timer_expired"])

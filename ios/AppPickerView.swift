@@ -3,7 +3,7 @@ import FamilyControls
 import ManagedSettings
 
 struct AppPickerView: View {
-    @State private var selection = FamilyActivitySelection()
+    @State private var selection = SharedModel.shared.selection
     @Environment(\.dismiss) var dismiss // Adds the ability to close the modal
 
     var body: some View {
@@ -30,15 +30,8 @@ struct AppPickerView: View {
     }
 
     func saveSelection() {
-        // 1. Save to your SharedModel for internal logic
-        SharedModel.shared.selectedApps = selection.applicationTokens
-        
-        // 2. APPLY THE SHIELD (This is what actually blocks the apps)
-        let store = ManagedSettingsStore()
-        store.shield.applications = selection.applicationTokens
-        store.shield.applicationCategories = .specific(selection.categoryTokens)
-        
-        // 3. Close the screen
+        SharedModel.shared.selection = selection
+        // Close the screen
         dismiss()
     }
 }

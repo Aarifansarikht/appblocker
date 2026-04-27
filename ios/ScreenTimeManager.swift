@@ -3,11 +3,21 @@ import FamilyControls
 import DeviceActivity
 import ManagedSettings
 import SwiftUI
+import UserNotifications
 
 @objc(ScreenTimeManager)
 class ScreenTimeManager: NSObject {
 
+    static let shared = ScreenTimeManager()
+
     let store = ManagedSettingsStore()
+    private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    private var blockWorkItem: DispatchWorkItem?
+
+    // 🔁 INTERVAL TIMER: Save duration for auto-restart after unlock
+    private var savedDuration: Int = 0
+    private var isIntervalActive: Bool = false
+    private let sharedDefaults = UserDefaults(suiteName: "group.com.appblocker")
 
     static func moduleName() -> String! {
         return "ScreenTimeManager"
@@ -27,6 +37,14 @@ class ScreenTimeManager: NSObject {
             // Fallback on earlier versions
           }
         }
+
+        // 📢 Also request notification permission
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("❌ Notification permission error: \(error)")
+            }
+            print("📢 Notification permission granted: \(granted)")
+        }
     }
 
     // 📱 Picker
@@ -38,12 +56,22 @@ class ScreenTimeManager: NSObject {
         }
     }
 
-    // 🚀 START TIMER SESSION
+    // 🚀 START TIMER SESSION — blocks apps INSTANTLY after timer expires
     @objc
     func startMonitoring(_ seconds: NSNumber) {
 
         let duration = seconds.intValue
 
+        // 💾 Save duration for interval restart
+        savedDuration = duration
+        isIntervalActive = true
+
+        // ❌ Cancel any previous work
+        blockWorkItem?.cancel()
+        blockWorkItem = nil
+        endBackgroundTask()
+
+        // ✅ DeviceActivity monitoring (backup if extension exists)
         let now = Date()
         let end = Calendar.current.date(byAdding: .second, value: duration, to: now)!
 
@@ -60,24 +88,162 @@ class ScreenTimeManager: NSObject {
             DeviceActivityName("session"),
             during: schedule
         )
+
+        // 🔥 REQUEST BACKGROUND EXECUTION — keeps app alive after user switches away
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "AppBlockerTimer") { [weak self] in
+            // System is about to kill our background time — apply shield NOW
+            self?.applyShield()
+            self?.endBackgroundTask()
+        }
+
+        // 🔥 SCHEDULE INSTANT SHIELD APPLICATION
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.applyShield()
+            self?.endBackgroundTask()
+        }
+        blockWorkItem = workItem
+
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(
+            deadline: .now() + Double(duration),
+            execute: workItem
+        )
+
+        // 📢 Schedule notification for when timer expires
+        scheduleTimerNotification(seconds: duration)
+
+        print("✅ Timer started: \(duration) seconds. Interval mode: ON")
     }
 
-    // ⚙️ Save Difficulty
+    // 🔒 Apply shield to block selected apps — INSTANT
+    private func applyShield() {
+        let selection = SharedModel.shared.selection
+
+        let appTokens = selection.applicationTokens
+        let categoryTokens = selection.categoryTokens
+
+        print("🔒 BLOCKING NOW — Apps: \(appTokens.count), Categories: \(categoryTokens.count)")
+
+        // Apply shield to apps
+        store.shield.applications = appTokens
+
+        // Apply shield to categories
+        if !categoryTokens.isEmpty {
+            store.shield.applicationCategories = .specific(categoryTokens)
+        }
+
+        // Send immediate notification
+        sendLockNotification()
+
+        print("✅ Shield applied — apps are now blocked")
+    }
+
+    // 🔄 End background task
+    private func endBackgroundTask() {
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
+    }
+
+    // ⚙️ Save Difficulty — uses App Group so extensions can read it
     @objc
     func setDifficulty(_ level: String) {
-        UserDefaults.standard.set(level, forKey: "math_difficulty")
+        sharedDefaults?.set(level, forKey: "math_difficulty")
     }
 
-    // 🔓 Unlock
+    // 🔓 Unlock — removes shield and AUTO-RESTARTS timer for next interval
     @objc
     func unlockApps() {
         store.shield.applications = nil
+        store.shield.applicationCategories = nil
+
+        // Cancel pending block timer
+        blockWorkItem?.cancel()
+        blockWorkItem = nil
+        endBackgroundTask()
+
+        print("✅ Apps unlocked — shield removed")
+
+        // 🔁 AUTO-RESTART: If interval is active, start next timer cycle
+        if isIntervalActive && savedDuration > 0 {
+            print("🔁 Interval timer: Starting next cycle (\(savedDuration)s)")
+            startMonitoring(NSNumber(value: savedDuration))
+        }
     }
+
+    // 🛑 STOP BLOCKING — completely stops the interval cycle
     @objc
-func openUnlockScreen() {
-    DispatchQueue.main.async {
-        let vc = UIHostingController(rootView: UnlockView())
-        UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+    func stopBlocking() {
+        // Stop interval
+        isIntervalActive = false
+        savedDuration = 0
+
+        // Remove shield
+        store.shield.applications = nil
+        store.shield.applicationCategories = nil
+
+        // Cancel pending timer
+        blockWorkItem?.cancel()
+        blockWorkItem = nil
+        endBackgroundTask()
+
+        // Stop DeviceActivity monitoring
+        DeviceActivityCenter().stopMonitoring()
+
+        // Cancel pending notifications
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["timer_expired"])
+
+        print("🛑 Blocking stopped completely — interval cycle ended")
     }
-}
+
+    // 🧠 OPEN UNLOCK SCREEN (MATH CHALLENGE)
+    @objc
+    func openUnlockScreen() {
+        DispatchQueue.main.async {
+            let vc = UIHostingController(rootView: UnlockView())
+            UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+        }
+    }
+
+    // 📢 Schedule notification for when timer expires
+    private func scheduleTimerNotification(seconds: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = "🔒 Time's Up!"
+        content.body = "Your app usage time has expired. Open AppBlocker and solve the challenge to unlock."
+        content.sound = .default
+        content.categoryIdentifier = "APP_LOCKED"
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: TimeInterval(seconds),
+            repeats: false
+        )
+
+        let request = UNNotificationRequest(
+            identifier: "timer_expired",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Failed to schedule notification: \(error)")
+            }
+        }
+    }
+
+    // 📢 Send lock notification immediately
+    private func sendLockNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "🔒 Apps Blocked"
+        content.body = "Open AppBlocker and solve the math challenge to unlock your apps."
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "app_locked_now",
+            content: content,
+            trigger: nil
+        )
+
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+    }
 }

@@ -81,6 +81,13 @@ const AppService = {
       ScreenTimeManager.openUnlockScreen();
     }
   },
+
+  // 🛑 STOP BLOCKING (IOS ONLY) — fully stops the interval cycle
+  stopBlocking: () => {
+    if (isIOS && ScreenTimeManager?.stopBlocking) {
+      ScreenTimeManager.stopBlocking();
+    }
+  },
 };
 
 export default AppService;

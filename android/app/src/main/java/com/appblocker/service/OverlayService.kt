@@ -73,6 +73,7 @@ class OverlayService : Service() {
         val opt1 = view?.findViewById<Button>(R.id.option1)
         val opt2 = view?.findViewById<Button>(R.id.option2)
         val opt3 = view?.findViewById<Button>(R.id.option3)
+        val openAppBlockerBtn = view?.findViewById<Button>(R.id.openAppBlocker)
 
         // 🔥 generate math
         val a = Random.nextInt(1, 20)
@@ -104,13 +105,22 @@ class OverlayService : Service() {
                 removeOverlay()
 
             } else {
-                error?.text = "❌ Wrong answer"
+                error?.text = "❌ Wrong answer, try again!"
             }
         }
 
         opt1?.setOnClickListener { handleClick(opt1.text.toString().toInt()) }
         opt2?.setOnClickListener { handleClick(opt2.text.toString().toInt()) }
         opt3?.setOnClickListener { handleClick(opt3.text.toString().toInt()) }
+
+        // 🔥 Open AppBlocker button — launches the main app
+        openAppBlockerBtn?.setOnClickListener {
+            val launchIntent = packageManager.getLaunchIntentForPackage("com.appblocker")
+            if (launchIntent != null) {
+                launchIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(launchIntent)
+            }
+        }
 
         return START_NOT_STICKY
     }

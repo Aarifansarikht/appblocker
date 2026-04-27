@@ -8,47 +8,72 @@ struct UnlockView: View {
     @State var op = "+"
     @State var correctAns = 0
     @State var options: [Int] = []
-    
-    let difficulty = UserDefaults.standard.string(forKey: "math_difficulty") ?? "Easy"
-    
+    @State var errorMessage = ""
+
+    // 🔥 Read difficulty from App Group UserDefaults (shared with extensions)
+    let difficulty: String
+
     @Environment(\.dismiss) var dismiss
 
+    init() {
+        let defaults = UserDefaults(suiteName: "group.com.appblocker")
+        self.difficulty = defaults?.string(forKey: "math_difficulty") ?? "Easy"
+    }
+
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
+            Text("🔐")
+                .font(.system(size: 48))
+
             Text("Solve to Unlock")
-                .font(.headline)
+                .font(.title2.bold())
+
+            Text("Difficulty: \(difficulty)")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
             Text("\(a) \(op) \(b) = ?")
-                .font(.largeTitle)
+                .font(.system(size: 40, weight: .bold))
                 .padding()
 
             ForEach(options, id: \.self) { opt in
                 Button(action: {
                     if opt == correctAns {
+                        // ✅ Correct — remove shield
                         let store = ManagedSettingsStore()
                         store.shield.applications = nil
                         store.shield.applicationCategories = nil
                         dismiss()
                     } else {
+                        // ❌ Wrong — regenerate question
+                        errorMessage = "❌ Wrong answer! Try again."
                         generateMath()
                     }
                 }) {
                     Text("\(opt)")
-                        .frame(minWidth: 100)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.black)
                         .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .cornerRadius(12)
                 }
-                .padding(.bottom, 5)
+            }
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.caption)
             }
         }
+        .padding()
         .onAppear {
             generateMath()
         }
     }
 
     func generateMath() {
+        errorMessage = ""
+
         if difficulty == "Easy" {
             a = Int.random(in: 1...20)
             b = Int.random(in: 1...20)
@@ -72,10 +97,10 @@ struct UnlockView: View {
             correctAns = a * b
             op = "×"
         }
-        
+
         let wrong1 = correctAns + Int.random(in: 1...10)
         let wrong2 = correctAns - Int.random(in: 1...5)
-        
+
         options = [correctAns, wrong1, wrong2].shuffled()
     }
 }

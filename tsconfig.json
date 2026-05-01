@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["jest"]
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "App.js", "src/layout/Container.js", "src/components/headers/MainHeader.js", "src/screens/home/Home.js", "src/screens/permission/AccessibilityPermission.js", "src/screens/app-list/AppsListScreen.js", "src/screens/blocking/BlockingConditionsScreen.js", "src/screens/blocking/QuickBlockScreen.js", "src/screens/blocking/ScheduleBlockScreen.js", "src/screens/settings/Settings.js", "src/utils/permissions.js", "src/screens/stats/Stats.js"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

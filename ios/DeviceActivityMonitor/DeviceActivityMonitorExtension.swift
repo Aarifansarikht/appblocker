@@ -11,11 +11,11 @@ import FamilyControls
 import Foundation
 
 // 🔥 This extension runs in a SEPARATE PROCESS from the main app.
-// It uses App Groups (group.com.appblocker) to share data with the main app.
+// It uses App Groups (group.com.screentoskill) to share data with the main app.
 class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
     let store = ManagedSettingsStore()
-    let defaults = UserDefaults(suiteName: "group.com.appblocker")
+    let defaults = UserDefaults(suiteName: "group.com.screentoskill")
 
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)

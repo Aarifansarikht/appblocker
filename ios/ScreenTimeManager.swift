@@ -17,7 +17,7 @@ class ScreenTimeManager: NSObject {
     // 🔁 INTERVAL TIMER: Save duration for auto-restart after unlock
     private var savedDuration: Int = 0
     private var isIntervalActive: Bool = false
-    private let sharedDefaults = UserDefaults(suiteName: "group.com.appblocker")
+    private let sharedDefaults = UserDefaults(suiteName: "group.com.screentoskill")
     private let appsLockedKey = "apps_are_locked"
     private let timerDurationKey = "saved_timer_duration"
     private let intervalActiveKey = "interval_blocking_active"

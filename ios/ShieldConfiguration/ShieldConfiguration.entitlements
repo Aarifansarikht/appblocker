@@ -6,7 +6,7 @@
         <true/>
         <key>com.apple.security.application-groups</key>
         <array>
-            <string>group.com.appblocker</string>
+            <string>group.com.screentoskill</string>
         </array>
     </dict>
 </plist>

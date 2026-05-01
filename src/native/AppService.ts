@@ -9,15 +9,19 @@ const isAndroid = Platform.OS === 'android';
 
 const AppService = {
   // 🔐 PERMISSIONS
-  requestPermission: () => {
+  requestAccessibilityPermission: () => {
     console.log('Requesting permissions...', { isIOS, isAndroid, ScreenTimeManager });
     if (isAndroid) {
       AppLocker.openAccessibilitySettings();
-
-      // small delay to avoid UI clash
-      setTimeout(() => {
-        AppLocker.requestOverlayPermission();
-      }, 800);
+    } else if (isIOS && ScreenTimeManager) {
+      ScreenTimeManager.requestPermission();
+    }
+  },
+  requestOverlayPermission: () => {
+    console.log('Requesting permissions...', { isIOS, isAndroid, ScreenTimeManager });
+    if (isAndroid) {
+      AppLocker.requestOverlayPermission();
+    
     } else if (isIOS && ScreenTimeManager) {
       ScreenTimeManager.requestPermission();
     }
@@ -51,7 +55,17 @@ const AppService = {
       AppLocker.setAppTimer(pkg, time);
     }
   },
-
+saveSchedule: (pkg: any, days: any) => {
+  if (isAndroid) {
+    AppLocker.saveSchedule(pkg, days);
+  }
+},
+getSchedule: async (pkg: any) => {
+  if (isAndroid) {
+    return await AppLocker.getSchedule(pkg);
+  }
+  return [];
+},
   // 🚀 START BLOCKING (IOS SESSION TIMER)
   startBlocking: (time: number, difficulty: string = 'Easy') => {
     if (isIOS && ScreenTimeManager) {
@@ -59,7 +73,11 @@ const AppService = {
       ScreenTimeManager.startMonitoring(time);
     }
   },
-
+unlockApp: (pkg: string) => {
+  if (isAndroid) {
+    AppLocker.unlockApp(pkg); // calls native
+  }
+},
   // 🔓 UNLOCK
   unlock: () => {
     if (isIOS && ScreenTimeManager) {

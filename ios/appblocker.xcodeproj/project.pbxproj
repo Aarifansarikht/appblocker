@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C80B921A6F3F58F76C31292 /* libPods-appblocker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-appblocker.a */; };
+		0C80B921A6F3F58F76C31292 /* libPods-screentoskill.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-screentoskill.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1483D5DA9DFF8EB377CE117D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
@@ -25,6 +25,20 @@
 		DF36316D2F9F46B600117D8F /* ShieldConfigurations.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF3631632F9F46B600117D8F /* ShieldConfigurations.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF3631782F9F46FB00117D8F /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF3631772F9F46FB00117D8F /* DeviceActivity.framework */; };
 		DF3631802F9F46FB00117D8F /* DeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF3631762F9F46FB00117D8F /* DeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B5C9F752D5F34A75A0E95C16 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74D32E5C8E604F09A5239B84 /* Poppins-Bold.ttf */; };
+		783CC92EE49346B8A699A5A9 /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA7488D668CE415B91785D30 /* Poppins-ExtraBold.ttf */; };
+		F9BCB6DC693A4BE5909B8EB3 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 94C91BFA2BD843AA9A2D4136 /* Poppins-ExtraLight.ttf */; };
+		A11738F7DDD2441BB2471F3E /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D8BF3091EE5488C97C15BFE /* Poppins-Light.ttf */; };
+		5529D8939230467788915A46 /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F53DB9D37E90428AA3C5B64A /* Poppins-Medium.ttf */; };
+		300C0AC58CBF4459B0FFA8BB /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63484F97CDC34503BCB02750 /* Poppins-Regular.ttf */; };
+		3CB2B45EF0FA485D9CE4DCB6 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E95CF7823E044913A00427A0 /* Poppins-SemiBold.ttf */; };
+		0E0DB695D3324DA38B3CBDDE /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BAEA8D0C89FB4CFF85AF0886 /* Poppins-Thin.ttf */; };
+		7AA8BE714C794A6299D64AEE /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C8B53E0FF68B4A68BE04536E /* Roboto-Black.ttf */; };
+		73481F00B38C459ABCEEE3C6 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0605746D50FD4B05A7B601BC /* Roboto-Bold.ttf */; };
+		AE37EA08F823450C845C6220 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6488B6D438FB40A89FC8CE5F /* Roboto-Light.ttf */; };
+		ADE0AEF828F74C4EBC4E8690 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCD3471D04F64AD9A7567E8A /* Roboto-Medium.ttf */; };
+		A6462DD7C4E74B94986B7DD1 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4C93D8F66C094091829F9084 /* Roboto-Regular.ttf */; };
+		5754A5DB5E2F40C89E9ABF07 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F403788EA79D45DF99E782BB /* Roboto-Thin.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,23 +82,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		13B07F961A680F5B00A75B9A /* appblocker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = appblocker.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = appblocker/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = appblocker/Info.plist; sourceTree = "<group>"; };
-		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = appblocker/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		3B4392A12AC88292D35C810B /* Pods-appblocker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appblocker.debug.xcconfig"; path = "Target Support Files/Pods-appblocker/Pods-appblocker.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-appblocker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appblocker.release.xcconfig"; path = "Target Support Files/Pods-appblocker/Pods-appblocker.release.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-appblocker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-appblocker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = appblocker/AppDelegate.swift; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = appblocker/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* screentoskill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screentoskill.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = screentoskill/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = screentoskill/Info.plist; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = screentoskill/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3B4392A12AC88292D35C810B /* Pods-screentoskill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screentoskill.debug.xcconfig"; path = "Target Support Files/Pods-screentoskill/Pods-screentoskill.debug.xcconfig"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-screentoskill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screentoskill.release.xcconfig"; path = "Target Support Files/Pods-screentoskill/Pods-screentoskill.release.xcconfig"; sourceTree = "<group>"; };
+		5DCACB8F33CDC322A6C60F78 /* libPods-screentoskill.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-screentoskill.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = screentoskill/AppDelegate.swift; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = screentoskill/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DF1A44752F9B8843008533AD /* ActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitor.swift; sourceTree = "<group>"; };
 		DF1A44772F9B8872008533AD /* AppPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerView.swift; sourceTree = "<group>"; };
 		DF1A44792F9B8886008533AD /* ScreenTimeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeManager.swift; sourceTree = "<group>"; };
 		DF1A447B2F9B8899008533AD /* SharedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModel.swift; sourceTree = "<group>"; };
 		DF1A447D2F9B88AB008533AD /* UnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockView.swift; sourceTree = "<group>"; };
-		DF1A447F2F9B8914008533AD /* appblocker-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "appblocker-Bridging-Header.h"; sourceTree = "<group>"; };
+		DF1A447F2F9B8914008533AD /* screentoskill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screentoskill-Bridging-Header.h"; sourceTree = "<group>"; };
 		DF1A44822F9B92F3008533AD /* ScreenTimeManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScreenTimeManager.m; sourceTree = "<group>"; };
-		DF1A44842F9B955B008533AD /* appblocker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = appblocker.entitlements; path = appblocker/appblocker.entitlements; sourceTree = "<group>"; };
+		DF1A44842F9B955B008533AD /* screentoskill.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = screentoskill.entitlements; path = screentoskill/screentoskill.entitlements; sourceTree = "<group>"; };
 		DF3630F72F9F3C8C00117D8F /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		DF36310E2F9F3E4600117D8F /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
 		DF3631512F9F463F00117D8F /* ShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +106,20 @@
 		DF3631762F9F46FB00117D8F /* DeviceActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF3631772F9F46FB00117D8F /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		74D32E5C8E604F09A5239B84 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; name = "Poppins-Bold.ttf"; path = "../src/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FA7488D668CE415B91785D30 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; name = "Poppins-ExtraBold.ttf"; path = "../src/assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		94C91BFA2BD843AA9A2D4136 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0D8BF3091EE5488C97C15BFE /* Poppins-Light.ttf */ = {isa = PBXFileReference; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F53DB9D37E90428AA3C5B64A /* Poppins-Medium.ttf */ = {isa = PBXFileReference; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		63484F97CDC34503BCB02750 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; name = "Poppins-Regular.ttf"; path = "../src/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E95CF7823E044913A00427A0 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		BAEA8D0C89FB4CFF85AF0886 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; name = "Poppins-Thin.ttf"; path = "../src/assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C8B53E0FF68B4A68BE04536E /* Roboto-Black.ttf */ = {isa = PBXFileReference; name = "Roboto-Black.ttf"; path = "../src/assets/fonts/Roboto-Black.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0605746D50FD4B05A7B601BC /* Roboto-Bold.ttf */ = {isa = PBXFileReference; name = "Roboto-Bold.ttf"; path = "../src/assets/fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6488B6D438FB40A89FC8CE5F /* Roboto-Light.ttf */ = {isa = PBXFileReference; name = "Roboto-Light.ttf"; path = "../src/assets/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		DCD3471D04F64AD9A7567E8A /* Roboto-Medium.ttf */ = {isa = PBXFileReference; name = "Roboto-Medium.ttf"; path = "../src/assets/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4C93D8F66C094091829F9084 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; name = "Roboto-Regular.ttf"; path = "../src/assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F403788EA79D45DF99E782BB /* Roboto-Thin.ttf */ = {isa = PBXFileReference; name = "Roboto-Thin.ttf"; path = "../src/assets/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -119,9 +147,42 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		DF3631532F9F464000117D8F /* ShieldConfiguration */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (DF36315B2F9F464000117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ShieldConfiguration; sourceTree = "<group>"; };
-		DF3631662F9F46B600117D8F /* ShieldConfigurations */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (DF36316E2F9F46B600117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ShieldConfigurations; sourceTree = "<group>"; };
-		DF3631792F9F46FB00117D8F /* DeviceActivityMonitor */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (DF3631812F9F46FB00117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DeviceActivityMonitor; sourceTree = "<group>"; };
+		DF3631532F9F464000117D8F /* ShieldConfiguration */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DF36315B2F9F464000117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = ShieldConfiguration;
+			sourceTree = "<group>";
+		};
+		DF3631662F9F46B600117D8F /* ShieldConfigurations */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DF36316E2F9F46B600117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = ShieldConfigurations;
+			sourceTree = "<group>";
+		};
+		DF3631792F9F46FB00117D8F /* DeviceActivityMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DF3631812F9F46FB00117D8F /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = DeviceActivityMonitor;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +190,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-appblocker.a in Frameworks */,
+				0C80B921A6F3F58F76C31292 /* libPods-screentoskill.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,10 +222,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		13B07FAE1A68108700A75B9A /* appblocker */ = {
+		13B07FAE1A68108700A75B9A /* screentoskill */ = {
 			isa = PBXGroup;
 			children = (
-				DF1A44842F9B955B008533AD /* appblocker.entitlements */,
+				DF1A44842F9B955B008533AD /* screentoskill.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -175,17 +236,17 @@
 				DF1A44792F9B8886008533AD /* ScreenTimeManager.swift */,
 				DF1A447B2F9B8899008533AD /* SharedModel.swift */,
 				DF1A447D2F9B88AB008533AD /* UnlockView.swift */,
-				DF1A447F2F9B8914008533AD /* appblocker-Bridging-Header.h */,
+				DF1A447F2F9B8914008533AD /* screentoskill-Bridging-Header.h */,
 				DF1A44822F9B92F3008533AD /* ScreenTimeManager.m */,
 			);
-			name = appblocker;
+			name = screentoskill;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-appblocker.a */,
+				5DCACB8F33CDC322A6C60F78 /* libPods-screentoskill.a */,
 				DF3630F72F9F3C8C00117D8F /* ManagedSettings.framework */,
 				DF36310E2F9F3E4600117D8F /* ManagedSettingsUI.framework */,
 				DF3631772F9F46FB00117D8F /* DeviceActivity.framework */,
@@ -203,7 +264,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* appblocker */,
+				13B07FAE1A68108700A75B9A /* screentoskill */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				DF3631532F9F464000117D8F /* ShieldConfiguration */,
 				DF3631662F9F46B600117D8F /* ShieldConfigurations */,
@@ -211,6 +272,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				5A6E518D3811407CB9BE80AF /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -220,7 +282,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* appblocker.app */,
+				13B07F961A680F5B00A75B9A /* screentoskill.app */,
 				DF3631512F9F463F00117D8F /* ShieldConfiguration.appex */,
 				DF3631632F9F46B600117D8F /* ShieldConfigurations.appex */,
 				DF3631762F9F46FB00117D8F /* DeviceActivityMonitor.appex */,
@@ -231,18 +293,40 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-appblocker.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-appblocker.release.xcconfig */,
+				3B4392A12AC88292D35C810B /* Pods-screentoskill.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-screentoskill.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		5A6E518D3811407CB9BE80AF /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				74D32E5C8E604F09A5239B84 /* Poppins-Bold.ttf */,
+				FA7488D668CE415B91785D30 /* Poppins-ExtraBold.ttf */,
+				94C91BFA2BD843AA9A2D4136 /* Poppins-ExtraLight.ttf */,
+				0D8BF3091EE5488C97C15BFE /* Poppins-Light.ttf */,
+				F53DB9D37E90428AA3C5B64A /* Poppins-Medium.ttf */,
+				63484F97CDC34503BCB02750 /* Poppins-Regular.ttf */,
+				E95CF7823E044913A00427A0 /* Poppins-SemiBold.ttf */,
+				BAEA8D0C89FB4CFF85AF0886 /* Poppins-Thin.ttf */,
+				C8B53E0FF68B4A68BE04536E /* Roboto-Black.ttf */,
+				0605746D50FD4B05A7B601BC /* Roboto-Bold.ttf */,
+				6488B6D438FB40A89FC8CE5F /* Roboto-Light.ttf */,
+				DCD3471D04F64AD9A7567E8A /* Roboto-Medium.ttf */,
+				4C93D8F66C094091829F9084 /* Roboto-Regular.ttf */,
+				F403788EA79D45DF99E782BB /* Roboto-Thin.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* appblocker */ = {
+		13B07F861A680F5B00A75B9A /* screentoskill */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "appblocker" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "screentoskill" */;
 			buildPhases = (
 				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -260,9 +344,9 @@
 				DF36316C2F9F46B600117D8F /* PBXTargetDependency */,
 				DF36317F2F9F46FB00117D8F /* PBXTargetDependency */,
 			);
-			name = appblocker;
-			productName = appblocker;
-			productReference = 13B07F961A680F5B00A75B9A /* appblocker.app */;
+			name = screentoskill;
+			productName = screentoskill;
+			productReference = 13B07F961A680F5B00A75B9A /* screentoskill.app */;
 			productType = "com.apple.product-type.application";
 		};
 		DF3631502F9F463F00117D8F /* ShieldConfiguration */ = {
@@ -354,7 +438,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "appblocker" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "screentoskill" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -367,7 +451,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* appblocker */,
+				13B07F861A680F5B00A75B9A /* screentoskill */,
 				DF3631502F9F463F00117D8F /* ShieldConfiguration */,
 				DF3631622F9F46B600117D8F /* ShieldConfigurations */,
 				DF3631752F9F46FB00117D8F /* DeviceActivityMonitor */,
@@ -383,6 +467,20 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				1483D5DA9DFF8EB377CE117D /* PrivacyInfo.xcprivacy in Resources */,
+				B5C9F752D5F34A75A0E95C16 /* Poppins-Bold.ttf in Resources */,
+				783CC92EE49346B8A699A5A9 /* Poppins-ExtraBold.ttf in Resources */,
+				F9BCB6DC693A4BE5909B8EB3 /* Poppins-ExtraLight.ttf in Resources */,
+				A11738F7DDD2441BB2471F3E /* Poppins-Light.ttf in Resources */,
+				5529D8939230467788915A46 /* Poppins-Medium.ttf in Resources */,
+				300C0AC58CBF4459B0FFA8BB /* Poppins-Regular.ttf in Resources */,
+				3CB2B45EF0FA485D9CE4DCB6 /* Poppins-SemiBold.ttf in Resources */,
+				0E0DB695D3324DA38B3CBDDE /* Poppins-Thin.ttf in Resources */,
+				7AA8BE714C794A6299D64AEE /* Roboto-Black.ttf in Resources */,
+				73481F00B38C459ABCEEE3C6 /* Roboto-Bold.ttf in Resources */,
+				AE37EA08F823450C845C6220 /* Roboto-Light.ttf in Resources */,
+				ADE0AEF828F74C4EBC4E8690 /* Roboto-Medium.ttf in Resources */,
+				A6462DD7C4E74B94986B7DD1 /* Roboto-Regular.ttf in Resources */,
+				5754A5DB5E2F40C89E9ABF07 /* Roboto-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,6 +488,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5C9F752D5F34A75A0E95C16 /* Poppins-Bold.ttf in Resources */,
+				783CC92EE49346B8A699A5A9 /* Poppins-ExtraBold.ttf in Resources */,
+				F9BCB6DC693A4BE5909B8EB3 /* Poppins-ExtraLight.ttf in Resources */,
+				A11738F7DDD2441BB2471F3E /* Poppins-Light.ttf in Resources */,
+				5529D8939230467788915A46 /* Poppins-Medium.ttf in Resources */,
+				300C0AC58CBF4459B0FFA8BB /* Poppins-Regular.ttf in Resources */,
+				3CB2B45EF0FA485D9CE4DCB6 /* Poppins-SemiBold.ttf in Resources */,
+				0E0DB695D3324DA38B3CBDDE /* Poppins-Thin.ttf in Resources */,
+				7AA8BE714C794A6299D64AEE /* Roboto-Black.ttf in Resources */,
+				73481F00B38C459ABCEEE3C6 /* Roboto-Bold.ttf in Resources */,
+				AE37EA08F823450C845C6220 /* Roboto-Light.ttf in Resources */,
+				ADE0AEF828F74C4EBC4E8690 /* Roboto-Medium.ttf in Resources */,
+				A6462DD7C4E74B94986B7DD1 /* Roboto-Regular.ttf in Resources */,
+				5754A5DB5E2F40C89E9ABF07 /* Roboto-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +509,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5C9F752D5F34A75A0E95C16 /* Poppins-Bold.ttf in Resources */,
+				783CC92EE49346B8A699A5A9 /* Poppins-ExtraBold.ttf in Resources */,
+				F9BCB6DC693A4BE5909B8EB3 /* Poppins-ExtraLight.ttf in Resources */,
+				A11738F7DDD2441BB2471F3E /* Poppins-Light.ttf in Resources */,
+				5529D8939230467788915A46 /* Poppins-Medium.ttf in Resources */,
+				300C0AC58CBF4459B0FFA8BB /* Poppins-Regular.ttf in Resources */,
+				3CB2B45EF0FA485D9CE4DCB6 /* Poppins-SemiBold.ttf in Resources */,
+				0E0DB695D3324DA38B3CBDDE /* Poppins-Thin.ttf in Resources */,
+				7AA8BE714C794A6299D64AEE /* Roboto-Black.ttf in Resources */,
+				73481F00B38C459ABCEEE3C6 /* Roboto-Bold.ttf in Resources */,
+				AE37EA08F823450C845C6220 /* Roboto-Light.ttf in Resources */,
+				ADE0AEF828F74C4EBC4E8690 /* Roboto-Medium.ttf in Resources */,
+				A6462DD7C4E74B94986B7DD1 /* Roboto-Regular.ttf in Resources */,
+				5754A5DB5E2F40C89E9ABF07 /* Roboto-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +530,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5C9F752D5F34A75A0E95C16 /* Poppins-Bold.ttf in Resources */,
+				783CC92EE49346B8A699A5A9 /* Poppins-ExtraBold.ttf in Resources */,
+				F9BCB6DC693A4BE5909B8EB3 /* Poppins-ExtraLight.ttf in Resources */,
+				A11738F7DDD2441BB2471F3E /* Poppins-Light.ttf in Resources */,
+				5529D8939230467788915A46 /* Poppins-Medium.ttf in Resources */,
+				300C0AC58CBF4459B0FFA8BB /* Poppins-Regular.ttf in Resources */,
+				3CB2B45EF0FA485D9CE4DCB6 /* Poppins-SemiBold.ttf in Resources */,
+				0E0DB695D3324DA38B3CBDDE /* Poppins-Thin.ttf in Resources */,
+				7AA8BE714C794A6299D64AEE /* Roboto-Black.ttf in Resources */,
+				73481F00B38C459ABCEEE3C6 /* Roboto-Bold.ttf in Resources */,
+				AE37EA08F823450C845C6220 /* Roboto-Light.ttf in Resources */,
+				ADE0AEF828F74C4EBC4E8690 /* Roboto-Medium.ttf in Resources */,
+				A6462DD7C4E74B94986B7DD1 /* Roboto-Regular.ttf in Resources */,
+				5754A5DB5E2F40C89E9ABF07 /* Roboto-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,19 +572,19 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
@@ -462,7 +602,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-appblocker-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-screentoskill-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -475,19 +615,19 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-appblocker/Pods-appblocker-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-screentoskill/Pods-screentoskill-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -551,15 +691,15 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-appblocker.debug.xcconfig */;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-screentoskill.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = appblocker/appblocker.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screentoskill/screentoskill.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = appblocker/Info.plist;
+				INFOPLIST_FILE = screentoskill/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -571,10 +711,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker;
-				PRODUCT_NAME = appblocker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill;
+				PRODUCT_NAME = screentoskill;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_OBJC_BRIDGING_HEADER = "appblocker-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "screentoskill-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -584,14 +724,14 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-appblocker.release.xcconfig */;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-screentoskill.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = appblocker/appblocker.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screentoskill/screentoskill.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = appblocker/Info.plist;
+				INFOPLIST_FILE = screentoskill/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -603,10 +743,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker;
-				PRODUCT_NAME = appblocker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill;
+				PRODUCT_NAME = screentoskill;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_OBJC_BRIDGING_HEADER = "appblocker-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "screentoskill-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -800,7 +940,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.ShieldConfiguration;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.ShieldConfiguration;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -845,7 +985,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.ShieldConfiguration;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.ShieldConfiguration;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -889,7 +1029,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.ShieldConfigurations;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.ShieldConfigurations;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -934,7 +1074,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.ShieldConfigurations;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.ShieldConfigurations;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -978,7 +1118,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.DeviceActivityMonitor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.DeviceActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1023,7 +1163,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appblocker.DeviceActivityMonitor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screentoskill.DeviceActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1039,7 +1179,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "appblocker" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "screentoskill" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -1048,7 +1188,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "appblocker" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "screentoskill" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

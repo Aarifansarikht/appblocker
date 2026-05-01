@@ -12,7 +12,7 @@ import Foundation
 // 🔥 CRITICAL: Uses App Groups UserDefaults so ALL extensions can access the same data
 // Main app + ShieldConfiguration + ShieldAction + DeviceActivityMonitor ALL share this data
 
-let appGroupID = "group.com.appblocker"
+let appGroupID = "group.com.screentoskill"
 
 class SharedModel: ObservableObject {
     static let shared = SharedModel()

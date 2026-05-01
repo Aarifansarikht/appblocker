@@ -16,7 +16,7 @@ struct UnlockView: View {
     @Environment(\.dismiss) var dismiss
 
     init() {
-        let defaults = UserDefaults(suiteName: "group.com.appblocker")
+        let defaults = UserDefaults(suiteName: "group.com.screentoskill")
         self.difficulty = defaults?.string(forKey: "math_difficulty") ?? "Easy"
     }
 

@@ -2,7 +2,6 @@ package com.screentoskill.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 
 class AppAccessibilityService : AccessibilityService() {
@@ -10,7 +9,7 @@ class AppAccessibilityService : AccessibilityService() {
     private var lastPkg: String? = null
 
     companion object {
-        var isRunning = false  // 🔥 static flag to detect if service is alive
+        var isRunning = false // 🔥 static flag to detect if service is alive
     }
 
     override fun onServiceConnected() {
@@ -19,16 +18,21 @@ class AppAccessibilityService : AccessibilityService() {
         AppMonitor.contextRef = this
         lastPkg = null
 
-        // 🔥 Configure service info dynamically (more resilient than XML alone)
-        val info = AccessibilityServiceInfo().apply {
-            eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
-                         AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-            feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-            flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
-                    AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
-            notificationTimeout = 100
-        }
+        val info =
+                AccessibilityServiceInfo().apply {
+                    eventTypes =
+                            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
+                                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+                    feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
+                    flags =
+                            AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
+                                    AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+                    notificationTimeout = 100
+                }
         serviceInfo = info
+
+        // ✅ Start real-time schedule enforcement
+        AppMonitor.startGlobalScheduleChecker(this)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -55,7 +59,10 @@ class AppAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        isRunning = false  // 🔥 Mark service as dead
+        isRunning = false
         AppMonitor.contextRef = null
+
+        // ✅ Stop checker when service dies
+        AppMonitor.stopGlobalScheduleChecker()
     }
 }

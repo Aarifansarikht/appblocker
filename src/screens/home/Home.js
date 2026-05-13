@@ -27,7 +27,9 @@ export default function Home() {
   const totalTime = Object.values(state.timers || {}).reduce((acc, t) => acc + Number(t || 0), 0);
 
   const { permissions, loading, handleOverlay, handleAccessibility, handleUsage, handleNotification } = usePermissions();
-
+const scheduledApps = Object.keys(state.days || {}).filter(
+  pkg => state.days[pkg]?.length > 0
+).length;
   return (
     <Container>
       <KeyboardAwareScrollView nestedScrollEnabled contentContainerStyle={{ paddingTop: 0, flexGrow: 1 }} stickyHeaderIndices={[0]}>
@@ -50,7 +52,7 @@ export default function Home() {
 
           <Spacer space={"3%"} />
 
-          <AnalyticsCards blockedApps={state.selected.length} timeSaved={totalTime} />
+          <AnalyticsCards blockedApps={state.selected.length} scheduledApps={scheduledApps} />
 
           <SectionHeading title="Quick Actions" label="" />
           <QuickActionsCard

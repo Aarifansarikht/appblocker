@@ -13,15 +13,15 @@ export default function WheelColumn({ data, selected, onChange }) {
   const ref = useRef(null);
   const isScrolling = useRef(false);
 
-  // ✅ Set initial position after layout
-  useEffect(() => {
-    const index = data.indexOf(selected);
-    if (index >= 0) {
-      setTimeout(() => {
-        ref.current?.scrollTo({ y: index * ITEM_H, animated: false });
-      }, 50);
-    }
-  }, []);
+
+useEffect(() => {
+  const index = data.indexOf(selected);
+  if (index >= 0) {
+    setTimeout(() => {
+      ref.current?.scrollTo({ y: index * ITEM_H, animated: false });
+    }, 50);
+  }
+}, [selected]);  // ← fires on every selected change
 
   const snapToIndex = useCallback(
     index => {

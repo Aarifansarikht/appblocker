@@ -131,9 +131,9 @@ class AppLockerModule(private val reactContext: ReactApplicationContext) :
         lockedNow.remove(pkg)
         prefs.edit().putStringSet("locked_now_apps", lockedNow).apply()
     }
-    
+
     @ReactMethod
-    fun saveSchedule(pkg: String, days: ReadableArray) {
+    fun saveSchedule(pkg: String, days: ReadableArray, fromMins: Int, toMins: Int) {
         val prefs = reactContext.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
 
         val set = mutableSetOf<String>()
@@ -141,10 +141,12 @@ class AppLockerModule(private val reactContext: ReactApplicationContext) :
             set.add(days.getString(i)!!)
         }
 
-        prefs.edit().putStringSet("${pkg}_days", set).apply()
-
-        // ✅ RESET STATE WHEN SCHEDULE CHANGES
-        prefs.edit().remove("remaining_$pkg").apply()
+        prefs.edit()
+                .putStringSet("${pkg}_days", set)
+                .putInt("${pkg}_from", fromMins)
+                .putInt("${pkg}_to", toMins)
+                .remove("remaining_$pkg")
+                .apply()
 
         val lockedNow =
                 prefs.getStringSet("locked_now_apps", mutableSetOf())?.toMutableSet()
@@ -162,11 +164,18 @@ class AppLockerModule(private val reactContext: ReactApplicationContext) :
         try {
             val prefs = reactContext.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
             val days = prefs.getStringSet("${pkg}_days", emptySet()) ?: emptySet()
+            val from = prefs.getInt("${pkg}_from", -1)
+            val to = prefs.getInt("${pkg}_to", -1)
 
             val list = Arguments.createArray()
             days.forEach { list.pushString(it) }
 
-            promise.resolve(list)
+            val result = Arguments.createMap()
+            result.putArray("days", list)
+            result.putInt("from", from)
+            result.putInt("to", to)
+
+            promise.resolve(result)
         } catch (e: Exception) {
             promise.reject("ERROR", e)
         }
@@ -331,9 +340,17 @@ class AppLockerModule(private val reactContext: ReactApplicationContext) :
 
                 // 🔥 CASE 3: SCHEDULE BASED LOCK (THIS WAS MISSING)
                 if (days.isNotEmpty() && days.contains(today)) {
-                    lockedNow.add(pkg)
+                    val fromMins = prefs.getInt("${pkg}_from", -1)
+                    val toMins = prefs.getInt("${pkg}_to", -1)
+                    val cal = java.util.Calendar.getInstance()
+                    val nowMins =
+                            cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                                    cal.get(java.util.Calendar.MINUTE)
+                    // Only lock if we have a valid range AND we're inside it
+                    if (fromMins >= 0 && toMins >= 0 && nowMins in fromMins until toMins) {
+                        lockedNow.add(pkg)
+                    }
                 }
-
                 timers.putDouble(pkg, remaining / 1000.0)
             }
 
@@ -351,11 +368,14 @@ class AppLockerModule(private val reactContext: ReactApplicationContext) :
             promise.reject("ERROR", e)
         }
     }
-    
-
-@ReactMethod
-fun saveBlockSubject(subject: String) {
-    val prefs = reactContext.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
-    prefs.edit().putString("block_subject", subject).apply()
-}
+    @ReactMethod
+    fun clearSchedule(pkg: String) {
+        val prefs = reactContext.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
+        prefs.edit().remove("${pkg}_days").remove("${pkg}_from").remove("${pkg}_to").apply()
+    }
+    @ReactMethod
+    fun saveBlockSubject(subject: String) {
+        val prefs = reactContext.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
+        prefs.edit().putString("block_subject", subject).apply()
+    }
 }

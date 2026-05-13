@@ -1,25 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  InteractionManager,
-  Text,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from "react";
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, InteractionManager, Text } from "react-native";
 
-import Container from '../../layout/Container';
-import { useTheme } from '../../context/theme/ThemeContext';
-import { useAppBlocker } from '../../context/AppBlockerContext';
+import Container from "../../layout/Container";
+import { useTheme } from "../../context/theme/ThemeContext";
+import { useAppBlocker } from "../../context/AppBlockerContext";
 
-import { Fonts } from '../../utils/typography';
-import { CONTAINER_SPACING } from '../../utils/constants';
-import BackButton from '../../components/buttons/BackButton';
-import { LockIcon } from '../../utils/svg';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Fonts } from "../../utils/typography";
+import { CONTAINER_SPACING } from "../../utils/constants";
+import BackButton from "../../components/buttons/BackButton";
+import ClockIcon, { LockIcon } from "../../utils/svg";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppsListScreen() {
   const { colors } = useTheme();
@@ -33,7 +24,7 @@ export default function AppsListScreen() {
   useFocusEffect(
     useCallback(() => {
       state.refreshState();
-    }, [])
+    }, []),
   );
 
   //  Delay rendering for smooth UI
@@ -47,12 +38,16 @@ export default function AppsListScreen() {
   const renderItem = ({ item, index }) => {
     const isSelected = state.selected.includes(item.package);
     const isLocked = isSelected && state.lockedNow.includes(item.package);
+    const isScheduled = (state.days?.[item.package]?.length ?? 0) > 0;
 
+    const iconColor = isLocked ? "rgb(11,218,81)" : colors.paragraphLight;
+
+    const iconBg = isLocked ? "rgba(11,218,81,0.15)" : colors.placeholder;
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation.navigate('BlockingConditions', {
+          navigation.navigate("BlockingConditions", {
             app: item,
             isLocked,
             timer: state.timers?.[item.package] ?? 0,
@@ -71,37 +66,16 @@ export default function AppsListScreen() {
           {item.icon ? (
             <Image source={{ uri: item.icon }} style={styles.appIcon} />
           ) : (
-            <View
-              style={[
-                styles.placeholderIcon,
-                { backgroundColor: colors.placeholder },
-              ]}
-            />
+            <View style={[styles.placeholderIcon, { backgroundColor: colors.placeholder }]} />
           )}
-
-          <Text
-            style={[styles.appName, { color: colors.blackPrimary }]}
-            numberOfLines={1}
-          >
+          <Text style={[styles.appName, { color: colors.blackPrimary }]} numberOfLines={1}>
             {item.name}
           </Text>
         </View>
 
-        {/* RIGHT STATUS */}
-        <View
-          style={[
-            styles.statusIcon,
-            {
-              backgroundColor: isLocked
-                ? 'rgba(11,218,81,0.15)'
-                : colors.placeholder,
-            },
-          ]}
-        >
-          <LockIcon
-            color={isLocked ? 'rgb(11,218,81)' : colors.paragraphLight}
-            size={18}
-          />
+        {/* RIGHT STATUS — clock for scheduled, lock for instant/quick block */}
+        <View style={[styles.statusIcon, { backgroundColor: iconBg }]}>
+          {isScheduled ? <ClockIcon color={iconColor} size={18} /> : <LockIcon color={iconColor} size={18} />}
         </View>
       </TouchableOpacity>
     );
@@ -111,10 +85,7 @@ export default function AppsListScreen() {
     <Container>
       <View style={{ flex: 1, paddingBottom: insets.bottom + 60 }}>
         <View style={{ paddingHorizontal: CONTAINER_SPACING }}>
-          <BackButton
-            title="Blocked Apps"
-            wrapperStyle={{ padding: CONTAINER_SPACING }}
-          />
+          <BackButton title="Blocked Apps" wrapperStyle={{ padding: CONTAINER_SPACING }} />
         </View>
 
         <View
@@ -153,19 +124,19 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 18,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 
   item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 14,
   },
 
   left: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
 
@@ -193,13 +164,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   loader: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

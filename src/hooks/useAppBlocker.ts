@@ -1,12 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import {
-  NativeEventEmitter,
-  NativeModules,
-  Platform,
-  AppState,
-  Alert,
-} from 'react-native';
-
+import { NativeEventEmitter, NativeModules, Platform, AppState, Alert } from 'react-native';
 import AppService from '../native/AppService';
 import { AppType, TimersType } from '../types/app';
 
@@ -17,22 +10,16 @@ export const useAppBlocker = () => {
   const [unlocked, setUnlocked] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [isBlocking, setIsBlocking] = useState(false);
-  const [days, setDays] = useState({});
+  const [days, setDays] = useState<Record<string, string[]>>({});
   const [lockedNow, setLockedNow] = useState<string[]>([]);
-  // iOS
   const [iosTimer, setIosTimer] = useState(1);
   const [iosDifficulty, setIosDifficulty] = useState('Easy');
 
   const timersRef = useRef<TimersType>({});
   const selectedRef = useRef<string[]>([]);
 
-  // Keep refs in sync with state
-  useEffect(() => {
-    timersRef.current = timers;
-  }, [timers]);
-  useEffect(() => {
-    selectedRef.current = selected;
-  }, [selected]);
+  useEffect(() => { timersRef.current = timers; }, [timers]);
+  useEffect(() => { selectedRef.current = selected; }, [selected]);
 
   // ANDROID INIT
   useEffect(() => {
@@ -41,24 +28,14 @@ export const useAppBlocker = () => {
       refreshState();
       const emitter = new NativeEventEmitter(NativeModules.AppLocker);
       const sub = emitter.addListener('APP_UNLOCKED', pkg => {
-        console.log('UNLOCKED:', pkg);
-
-        //  mark unlocked
         setUnlocked(prev => [...new Set([...prev, pkg])]);
-
-        //  remove timer
         const { [pkg]: _, ...restTimers } = timersRef.current;
         timersRef.current = restTimers;
         setTimers({ ...restTimers });
-
-        //  REMOVE FROM SELECTED (THIS IS YOUR MAIN FIX)
         selectedRef.current = selectedRef.current.filter(p => p !== pkg);
         setSelected([...selectedRef.current]);
-
-        //  optional: update native storage (clean)
         AppService.unlockApp(pkg);
       });
-
       return () => sub.remove();
     }
   }, []);
@@ -66,9 +43,7 @@ export const useAppBlocker = () => {
   // IOS LOCK CHECK
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
-
     let busy = false;
-
     const check = async () => {
       if (busy) return;
       busy = true;
@@ -80,216 +55,130 @@ export const useAppBlocker = () => {
         busy = false;
       }
     };
-
     check();
-    const sub = AppState.addEventListener('change', s => {
-      if (s === 'active') check();
-    });
+    const sub = AppState.addEventListener('change', s => { if (s === 'active') check(); });
     return () => sub.remove();
   }, []);
 
   const refreshState = async () => {
     try {
       const res = await AppService.getFullState();
-
       const locked = res?.locked || [];
       const lockedNow = res?.lockedNow || [];
       const timers = res?.timers || {};
 
       setSelected(locked);
       selectedRef.current = locked;
-
       setTimers(timers);
       timersRef.current = timers;
-
-      setLockedNow(lockedNow); // ✅ NEW
-
-      // OPTIONAL (not needed anymore)
-      const unlockedApps = locked.filter(
-        (pkg: any) => !lockedNow.includes(pkg),
-      );
-      setUnlocked(unlockedApps);
+      setLockedNow(lockedNow);
+      setUnlocked(locked.filter((pkg: any) => !lockedNow.includes(pkg)));
     } catch (e) {
       console.log('refresh error', e);
     }
   };
+
   const getSchedule = async (pkg: any) => {
     if (Platform.OS === 'android') {
       const result = await AppService.getSchedule(pkg);
-
-      setDays(prev => ({
-        ...prev,
-        [pkg]: result || [],
-      }));
-
+      const daysList = result?.days || [];
+      const from: number = result?.from ?? -1;
+      const to: number = result?.to ?? -1;
+      setDays(prev => ({ ...prev, [pkg]: daysList }));
       return result;
     }
-    return [];
+    return null;
   };
+
   const loadApps = async () => {
     try {
       setLoading(true);
       const data = await AppService.getApps();
       setApps(data);
-      data.forEach((app: { package: any }) => {
-        getSchedule(app.package);
-      });
+      data.forEach((app: { package: any }) => getSchedule(app.package));
     } finally {
       setLoading(false);
     }
   };
-const setLockRange = (pkg: string, fromSecs: number, toSecs: number) => {
-  if (Platform.OS === 'android') {
-    AppService.setLockRange(pkg, fromSecs, toSecs);
-  }
-};
+
   const toggleApp = (pkg: string) => {
-    setSelected(prev =>
-      prev.includes(pkg) ? prev.filter(p => p !== pkg) : [...prev, pkg],
-    );
+    setSelected(prev => prev.includes(pkg) ? prev.filter(p => p !== pkg) : [...prev, pkg]);
   };
-  const loadLockedState = async () => {
-    try {
-      const res = await AppService.getLockedApps();
 
-      const locked = res?.locked || [];
-      const lockedNow = res?.lockedNow || [];
-
-      //  restore selected apps
-      setSelected(locked);
-      selectedRef.current = locked;
-
-      //  restore unlocked (inverse of lockedNow)
-      const unlockedApps = locked.filter(
-        (pkg: any) => !lockedNow.includes(pkg),
-      );
-      setUnlocked(unlockedApps);
-    } catch (e) {
-      console.log('Error loading locked state', e);
-    }
-  };
-  const loadFullState = async () => {
-    try {
-      const res = await AppService.getFullState();
-
-      const locked = res?.locked || [];
-      const lockedNow = res?.lockedNow || [];
-      const timers = res?.timers || {};
-
-      //  restore selected
-      setSelected(locked);
-      selectedRef.current = locked;
-
-      // restore timers
-      setTimers(timers);
-      timersRef.current = timers;
-
-      // restore unlocked correctly
-      const unlockedApps = locked.filter(
-        (pkg: any) => !lockedNow.includes(pkg),
-      );
-      setUnlocked(unlockedApps);
-    } catch (e) {
-      console.log('restore error', e);
-    }
-  };
   const setTimer = (pkg: string, time: number) => {
-    //  Update both state AND ref immediately
     timersRef.current = { ...timersRef.current, [pkg]: time };
     setTimers({ ...timersRef.current });
-
-    //  Write to native immediately — don't wait for saveApps
-    if (Platform.OS === 'android') {
-      AppService.setTimer(pkg, time);
-    }
+    if (Platform.OS === 'android') AppService.setTimer(pkg, time);
   };
 
   const relockApp = (pkg: string) => {
     AppService.relock(pkg);
     setUnlocked(prev => prev.filter(p => p !== pkg));
   };
+
   const _clearPkg = (pkg: string) => {
-    // 1. Clear from timers ref + state
     const { [pkg]: _, ...restTimers } = timersRef.current;
     timersRef.current = restTimers;
     setTimers({ ...restTimers });
-
-    // 2. Remove from unlocked
     setUnlocked(prev => prev.filter(p => p !== pkg));
-
-    // 3. Remove from selected
     selectedRef.current = selectedRef.current.filter(p => p !== pkg);
     setSelected([...selectedRef.current]);
   };
+
   const saveApps = (pkgList?: string[]) => {
     if (Platform.OS === 'android') {
-      //  Use passed list OR latest from ref — never stale state
       const toSave = pkgList ?? selectedRef.current;
-
       if (!toSave.length) return Alert.alert('Select at least one app');
-
       AppService.saveApps(toSave);
-
-      //  Read from ref — always latest timers
       toSave.forEach(pkg => {
         const t = timersRef.current[pkg] ?? 10;
         AppService.setTimer(pkg, t);
-        console.log(`Saving ${pkg} with timer: ${t}s`); // verify correct value
       });
-
       setIsBlocking(true);
     } else {
       AppService.startBlocking(iosTimer * 60, iosDifficulty);
       setIsBlocking(true);
     }
   };
+
   const unlockApp = (pkg: string) => {
     if (Platform.OS === 'android') {
-      // 1. Tell native to remove from locked_apps + clear timer in SharedPrefs
       AppService.unlockApp(pkg);
-
-      // 2. Clean JS state completely
       _clearPkg(pkg);
     }
   };
 
-  const saveSchedule = async (pkg: any, d: any) => {
-    if (Platform.OS === 'android') {
-      await AppService.saveSchedule(pkg, d);
+  const clearTimer = (pkg: string) => {
+    const { [pkg]: _, ...rest } = timersRef.current;
+    timersRef.current = rest;
+    setTimers({ ...rest });
+  };
 
-      //  update local state immediately
-      setDays(prev => ({
-        ...prev,
-        [pkg]: d,
-      }));
+  const clearSchedule = async (pkg: string) => {
+    if (Platform.OS === 'android') {
+      await AppService.clearSchedule(pkg);
+      setDays(prev => { const n = { ...prev }; delete n[pkg]; return n; });
     }
   };
+
+  const saveSchedule = async (pkg: any, days: any, fromMins?: number, toMins?: number) => {
+    if (Platform.OS === 'android') {
+      await AppService.saveSchedule(pkg, days, fromMins ?? 0, toMins ?? 0);
+      setDays(prev => ({ ...prev, [pkg]: days }));
+    }
+  };
+
   const stopBlocking = () => {
     AppService.stopBlocking();
     setIsBlocking(false);
   };
 
   return {
-    apps,
-    selected,
-    timers,
-    unlocked,
-    lockedNow,
-    loading,
-    isBlocking,
-    iosTimer,
-    iosDifficulty,
-    days,
-    setIosTimer,
-    setIosDifficulty,
-    toggleApp,
-    setTimer,
-    relockApp,
-    saveApps,
-    stopBlocking,
-    unlockApp,
-    saveSchedule,
-    getSchedule,
-    refreshState,
+    apps, selected, timers, unlocked, lockedNow, loading, isBlocking,
+    iosTimer, iosDifficulty, days,
+    setIosTimer, setIosDifficulty,
+    toggleApp, setTimer, relockApp, saveApps, stopBlocking,
+    unlockApp, saveSchedule, getSchedule, refreshState,
+    clearTimer, clearSchedule,
   };
 };

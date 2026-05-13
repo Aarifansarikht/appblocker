@@ -15,16 +15,108 @@ object AppMonitor {
     var contextRef: Context? = null
 
     // Still in-memory (these are session-only, intentional)
-
+    private var scheduleChecker: Handler? = null
     private val startTimeMap = mutableMapOf<String, Long>()
-
+    private var scheduleStartChecker: Handler? = null
+    private var isScheduleStartCheckerRunning = false
     private const val CHANNEL_ID = "app_blocker_timer"
     private const val NOTIFICATION_ID = 1001
 
     // ─────────────────────────────────────────────
     // SharedPrefs helpers — replaces in-memory maps
     // ─────────────────────────────────────────────
+    fun startGlobalScheduleChecker(context: Context) {
+    if (isScheduleStartCheckerRunning) return
+    isScheduleStartCheckerRunning = true
 
+    scheduleStartChecker = Handler(Looper.getMainLooper())
+    scheduleStartChecker?.post(object : Runnable {
+        override fun run() {
+            // ✅ Run check on background thread, UI calls are posted inside
+            Thread { checkAndEnforceSchedules(context) }.start()
+            scheduleStartChecker?.postDelayed(this, 5_000)
+        }
+    })
+}
+
+    fun stopGlobalScheduleChecker() {
+        scheduleStartChecker?.removeCallbacksAndMessages(null)
+        scheduleStartChecker = null
+        isScheduleStartCheckerRunning = false
+    }
+    private fun getForegroundApp(context: Context): String? {
+        return try {
+            val usageStatsManager =
+                    context.getSystemService(Context.USAGE_STATS_SERVICE) as
+                            android.app.usage.UsageStatsManager
+            val now = System.currentTimeMillis()
+            // ✅ Use a wider window (3 minutes) to reliably catch the foreground app
+            val stats =
+                    usageStatsManager.queryUsageStats(
+                            android.app.usage.UsageStatsManager.INTERVAL_DAILY,
+                            now - 180_000,
+                            now
+                    )
+            stats
+                    ?.filter { it.totalTimeInForeground > 0 }
+                    ?.maxByOrNull { it.lastTimeUsed }
+                    ?.packageName
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun checkAndEnforceSchedules(context: Context) {
+        val lockedApps = getLockedApps(context)
+        val lockedNow = getLockedNowApps(context).toMutableSet()
+        var changed = false
+
+        val cal = java.util.Calendar.getInstance()
+        val today = java.text.SimpleDateFormat("EEE", java.util.Locale.ENGLISH).format(cal.time)
+        val nowMins =
+                cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE)
+
+        // ✅ Prefer currentApp (set by accessibility events) — fall back to UsageStats
+        val foregroundPkg = currentApp ?: getForegroundApp(context)
+
+        lockedApps.forEach { pkg ->
+            val days = getAppDays(context, pkg)
+            if (days.isEmpty() || !days.contains(today)) return@forEach
+
+            val (fromMins, toMins) = getLockRange(context, pkg)
+            if (fromMins < 0 || toMins < 0) return@forEach
+
+            val insideWindow = nowMins in fromMins until toMins
+
+            if (insideWindow && !lockedNow.contains(pkg)) {
+                // Window just opened — mark as locked
+                lockedNow.add(pkg)
+                changed = true
+                clearRemainingTime(context, pkg)
+                startScheduleEndChecker(context, pkg)
+
+                // ✅ Show overlay if this app is currently in foreground
+                if (foregroundPkg == pkg) {
+                    Handler(Looper.getMainLooper()).post {
+                        OverlayService.show(context, pkg)
+                        showLockedNotification(context, pkg)
+                    }
+                }
+            }
+
+            if (!insideWindow && lockedNow.contains(pkg)) {
+                // Window closed — release
+                lockedNow.remove(pkg)
+                changed = true
+                clearRemainingTime(context, pkg)
+                if (foregroundPkg == pkg) {
+                    Handler(Looper.getMainLooper()).post { OverlayService.hide() }
+                }
+            }
+        }
+
+        if (changed) saveLockedNowApps(context, lockedNow)
+    }
     private fun getLockedNowApps(context: Context): MutableSet<String> {
         val prefs = context.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
         return prefs.getStringSet("locked_now_apps", mutableSetOf())?.toMutableSet()
@@ -61,59 +153,100 @@ object AppMonitor {
     // Core logic
     // ─────────────────────────────────────────────
 
-    fun handleAppChange(context: Context, pkg: String) {
-        contextRef = context
+  fun handleAppChange(context: Context, pkg: String) {
+    contextRef = context
 
-        if (!isTodayAllowed(context, pkg)) return
+    // ── Always track foreground app for schedule checker ──────────────────
+    // Must happen BEFORE isTodayAllowed so global checker knows what's on screen
+    if (isTargetApp(context, pkg)) {
+        currentApp = pkg   // ← even if outside window, we need to know it's here
+    } else {
+        currentApp = null  // ← non-target took over, clear it
+        OverlayService.hide()
+        return
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
-        if (!isTargetApp(context, pkg)) {
-            OverlayService.hide()
-            return
-        }
-
-        // Read locked state from SharedPrefs (survives app kill)
-        val lockedNow = getLockedNowApps(context)
+    if (!isTodayAllowed(context, pkg)) {
+        // Outside schedule window — release lock if it was active
+        OverlayService.hide()
+        val lockedNow = getLockedNowApps(context).toMutableSet()
         if (lockedNow.contains(pkg)) {
-            OverlayService.show(context, pkg)
-            return
+            lockedNow.remove(pkg)
+            saveLockedNowApps(context, lockedNow)
         }
+        return
+    }
 
-        if (currentApp == pkg && handler != null) return
+    val lockedNow = getLockedNowApps(context)
+    if (lockedNow.contains(pkg)) {
+        OverlayService.show(context, pkg)
+        return
+    }
 
-        currentApp = pkg
-        handler?.removeCallbacksAndMessages(null)
+    handler?.removeCallbacksAndMessages(null)
 
-        val remaining = getRemainingTime(context, pkg)
+    // ── SCHEDULE-BASED: inside window → lock instantly ────────────────────
+    val days = getAppDays(context, pkg)
+    if (days.isNotEmpty()) {
+        val updated = lockedNow.toMutableSet().apply { add(pkg) }
+        saveLockedNowApps(context, updated)
+        clearRemainingTime(context, pkg)
+        OverlayService.show(context, pkg)
+        showLockedNotification(context, pkg)
+        startScheduleEndChecker(context, pkg)
+        return
+    }
 
-        // Instant lock if no time left
-        if (remaining <= 1000) {
-            val updated = lockedNow.toMutableSet().apply { add(pkg) }
-            saveLockedNowApps(context, updated)
+    // ── TIMER-BASED ───────────────────────────────────────────────────────
+    if (handler != null) return  // countdown already running for this app
+
+    val remaining = getRemainingTime(context, pkg)
+    if (remaining <= 1000) {
+        val updated = lockedNow.toMutableSet().apply { add(pkg) }
+        saveLockedNowApps(context, updated)
+        clearRemainingTime(context, pkg)
+        OverlayService.show(context, pkg)
+        showLockedNotification(context, pkg)
+        return
+    }
+
+    startTimeMap[pkg] = System.currentTimeMillis()
+    showTimerNotification(context, pkg, remaining)
+
+    handler = Handler(Looper.getMainLooper())
+    handler?.postDelayed({
+        if (currentApp == pkg) {
+            val set = getLockedNowApps(context).toMutableSet().apply { add(pkg) }
+            saveLockedNowApps(context, set)
             clearRemainingTime(context, pkg)
             OverlayService.show(context, pkg)
             showLockedNotification(context, pkg)
-            return
         }
+    }, remaining)
+}
+    private fun startScheduleEndChecker(context: Context, pkg: String) {
+        scheduleChecker?.removeCallbacksAndMessages(null)
+        scheduleChecker = Handler(Looper.getMainLooper())
 
-        startTimeMap[pkg] = System.currentTimeMillis()
-
-        showTimerNotification(context, pkg, remaining)
-
-        handler = Handler(Looper.getMainLooper())
-        handler?.postDelayed(
-                {
-                    if (currentApp == pkg) {
-                        val set = getLockedNowApps(context).toMutableSet().apply { add(pkg) }
-                        saveLockedNowApps(context, set)
-                        clearRemainingTime(context, pkg)
-                        OverlayService.show(context, pkg)
-                        showLockedNotification(context, pkg)
+        scheduleChecker?.post(
+                object : Runnable {
+                    override fun run() {
+                        if (!isTodayAllowed(context, pkg)) {
+                            // Window is over — release the app
+                            val set = getLockedNowApps(context).toMutableSet().apply { remove(pkg) }
+                            saveLockedNowApps(context, set)
+                            clearRemainingTime(context, pkg)
+                            OverlayService.hide()
+                            currentApp = null
+                            scheduleChecker = null
+                            return // stop polling
+                        }
+                        scheduleChecker?.postDelayed(this, 30_000)
                     }
-                },
-                remaining
+                }
         )
     }
-
     fun onAppExit() {
         val context = contextRef ?: return
 
@@ -157,46 +290,58 @@ object AppMonitor {
         return prefs.getStringSet("${pkg}_days", emptySet()) ?: emptySet()
     }
 
-    fun isTodayAllowed(context: Context, pkg: String): Boolean {
-        val days = getAppDays(context, pkg)
-        if (days.isEmpty()) return true
-
-        val today =
-                java.text.SimpleDateFormat("EEE", java.util.Locale.ENGLISH).format(java.util.Date())
-
-        return days.contains(today)
+    fun getLockRange(context: Context, pkg: String): Pair<Int, Int> {
+        val prefs = context.getSharedPreferences("LOCKER", Context.MODE_PRIVATE)
+        val from = prefs.getInt("${pkg}_from", -1)
+        val to = prefs.getInt("${pkg}_to", -1)
+        return Pair(from, to)
     }
 
-   fun onUnlocked(pkg: String) {
-    val context = contextRef ?: return
+    fun isTodayAllowed(context: Context, pkg: String): Boolean {
+        val days = getAppDays(context, pkg)
+        if (days.isEmpty()) return true // no schedule = always active
 
-    val set = getLockedNowApps(context).toMutableSet().apply { remove(pkg) }
-    saveLockedNowApps(context, set)
+        val cal = java.util.Calendar.getInstance()
+        val today = java.text.SimpleDateFormat("EEE", java.util.Locale.ENGLISH).format(cal.time)
 
-    clearRemainingTime(context, pkg)
+        if (!days.contains(today)) return false // wrong day
 
-    // 🔥 IMPORTANT FIX
-    handler?.removeCallbacksAndMessages(null)
+        val (fromMins, toMins) = getLockRange(context, pkg)
+        if (fromMins < 0 || toMins < 0) return true // no time range saved = all day
 
-    startTimeMap.remove(pkg)
-    currentApp = null
-}
-   fun relockApp(pkg: String) {
-    val context = contextRef ?: return
+        val nowMins =
+                cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE)
+        return nowMins in fromMins until toMins // only lock within time window
+    }
 
-    val set = getLockedNowApps(context).toMutableSet().apply { remove(pkg) }
-    saveLockedNowApps(context, set)
+    fun onUnlocked(pkg: String) {
+        val context = contextRef ?: return
 
-    clearRemainingTime(context, pkg)
+        val set = getLockedNowApps(context).toMutableSet().apply { remove(pkg) }
+        saveLockedNowApps(context, set)
 
-    // 🔥 CRITICAL RESET
-    handler?.removeCallbacksAndMessages(null)
+        clearRemainingTime(context, pkg)
 
-    startTimeMap.remove(pkg)
-    currentApp = null   // 👈 THIS FIXES YOUR BUG
+        // 🔥 IMPORTANT FIX
+        handler?.removeCallbacksAndMessages(null)
 
-    OverlayService.hide()
-}
+        startTimeMap.remove(pkg)
+        currentApp = null
+    }
+    fun relockApp(pkg: String) {
+        val context = contextRef ?: return
+
+        scheduleChecker?.removeCallbacksAndMessages(null) // ← add this
+        scheduleChecker = null
+
+        val set = getLockedNowApps(context).toMutableSet().apply { remove(pkg) }
+        saveLockedNowApps(context, set)
+        clearRemainingTime(context, pkg)
+        handler?.removeCallbacksAndMessages(null)
+        startTimeMap.remove(pkg)
+        currentApp = null
+        OverlayService.hide()
+    }
 
     // ─────────────────────────────────────────────
     // Notifications

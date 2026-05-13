@@ -26,7 +26,7 @@ const AppService = {
       ScreenTimeManager.requestPermission();
     }
   },
-
+clearSchedule: (pkg: string) => NativeModules.AppLocker.clearSchedule(pkg),
   // 📱 APP SELECTION
   openAppSelector: () => {
     if (isIOS && ScreenTimeManager) {
@@ -69,11 +69,8 @@ const AppService = {
   },
  setLockRange: (pkg: string, fromSecs: number, toSecs: number) =>
   NativeModules.AppLocker.setLockRange(pkg, fromSecs, toSecs),
-saveSchedule: (pkg: any, days: any) => {
-  if (isAndroid) {
-    AppLocker.saveSchedule(pkg, days);
-  }
-},
+saveSchedule: (pkg: string, days: string[], fromMins: number, toMins: number) =>
+    NativeModules.AppLocker.saveSchedule(pkg, days, fromMins, toMins),
 getSchedule: async (pkg: any) => {
   if (isAndroid) {
     return await AppLocker.getSchedule(pkg);

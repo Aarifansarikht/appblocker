@@ -32,7 +32,7 @@ export default function Button({ onPress, isDisable = false, title, isLoading, i
                 opacity: isDisable ? 0.5 : 1,
                 borderWidth: isOutLine ? 1 : 0,
                 borderColor: colors.blackPrimary,
-                borderRadius: 45,
+                borderRadius: 12,
                 paddingHorizontal: 16,       
                 ...buttonStyle
             }}>

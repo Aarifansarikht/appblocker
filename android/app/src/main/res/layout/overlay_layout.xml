@@ -47,7 +47,7 @@
 
         <!-- QUESTION -->
         <TextView
-            android:id="@+id/mathQuestion"
+            android:id="@+id/questionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="12 + 7 = ?"

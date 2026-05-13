@@ -14,10 +14,11 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import Zocial from 'react-native-vector-icons/Zocial';
 
+
 /**
  *
  * @param {{
- * type: "fontAwesome" | "fontAwesome5" | "fontAwesome5Pro" | "antDesign" | "entypo" | "evilIcons" | "feather" | "fontisto" | "foundation" | "ionicons" | "materialCommunityIcons" | "materialIcons" | "octicons" | "simpleLineIcons" | "zocial",
+ * type: "fontAwesome" | "fontAwesome5" | "fontAwesome5Pro"  | "antDesign" | "entypo" | "evilIcons" | "feather" | "fontisto" | "foundation" | "ionicons" | "materialCommunityIcons" | "materialIcons" | "octicons" | "simpleLineIcons" | "zocial",
  * name:string,
  * color:string,
  * size:number,
@@ -136,6 +137,7 @@ const Icon = ({ type, name, color = '#000', size = 16, onPress, style }) => {
                 size={size}
                 onPress={onPress && onPress}
             />;
+       
         case 'materialIcons':
             return (
                 <MaterialIcons

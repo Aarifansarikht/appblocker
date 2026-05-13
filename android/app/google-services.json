@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "13023861479",
+    "project_id": "wilwincare",
+    "storage_bucket": "wilwincare.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13023861479:android:6fb65b8432375d8595a042",
+        "android_client_info": {
+          "package_name": "com.screentoskill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "13023861479-1h0nl3cf1j8ntokseb9quoo1oqi7r367.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy6MoLi-X9uRyB0gvXUlC4q26bRX5gQTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "13023861479-1h0nl3cf1j8ntokseb9quoo1oqi7r367.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

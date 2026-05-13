@@ -22,10 +22,28 @@ const OrderConfirm = ({
 
   return (
     <ModalLayout visible={isVisible} onClose={onClose}>
-      <View style={[styles.container, { backgroundColor: colors.background,borderWidth:2,borderColor: colors.borderColor }]}>
-        
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+            borderWidth: 2,
+            borderColor: colors.borderColor,
+            shadowColor: '#22C55E',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.4,
+            shadowRadius: 25,
+            elevation: 15,
+          },
+        ]}
+      >
         <View style={{ alignItems: 'center', paddingBottom: '10%' }}>
-          <Icon name='warning-outline' type='ionicons' size={90} color={colors.error} />
+          <Icon
+            name="warning-outline"
+            type="ionicons"
+            size={90}
+            color={colors.error}
+          />
         </View>
 
         <View style={{ paddingBottom: '10%' }}>

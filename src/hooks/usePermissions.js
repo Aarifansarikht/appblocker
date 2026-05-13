@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Linking } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import {
@@ -21,28 +21,52 @@ export default function usePermissions() {
     notifications: false,
   });
 
-  // 🔥 Load all permissions
-  const loadPermissions = async () => {
-    try {
-      const overlay = await checkOverlay();
-      const accessibility = await checkAccessibility();
-      const usage = await checkUsage();
-      const notifications = await checkNotifications();
+  const [loading, setLoading] = useState(true); // ✅ ADD
 
-      setPermissions({ overlay, accessibility, usage, notifications });
+  // 🔥 Load all permissions (OPTIMIZED)
+  const loadPermissions = useCallback(async () => {
+    try {
+      // ✅ run in parallel (faster + less flicker)
+      const [overlay, accessibility, usage, notifications] =
+        await Promise.all([
+          checkOverlay(),
+          checkAccessibility(),
+          checkUsage(),
+          checkNotifications(),
+        ]);
+
+      setPermissions(prev => {
+        // ✅ prevent unnecessary re-render (important)
+        if (
+          prev.overlay === overlay &&
+          prev.accessibility === accessibility &&
+          prev.usage === usage &&
+          prev.notifications === notifications
+        ) {
+          return prev;
+        }
+        return { overlay, accessibility, usage, notifications };
+      });
     } catch (e) {
       console.log('Permission error:', e);
+    } finally {
+      setLoading(false); // ✅ stop loading once
     }
-  };
+  }, []);
 
-  // 🔥 Auto refresh when screen focused
+  // 🔥 First load
+  useEffect(() => {
+    loadPermissions();
+  }, [loadPermissions]);
+
+  // 🔥 Refresh when screen focused
   useFocusEffect(
     useCallback(() => {
       loadPermissions();
-    }, [])
+    }, [loadPermissions])
   );
 
-  // 🔥 Auto refresh when app returns from settings
+  // 🔥 Refresh when returning from settings
   useEffect(() => {
     const sub = AppState.addEventListener('change', state => {
       if (state === 'active') {
@@ -51,31 +75,42 @@ export default function usePermissions() {
     });
 
     return () => sub.remove();
-  }, []);
+  }, [loadPermissions]);
 
-  // 🔥 Handlers
+  // 🔥 Handlers (no spam reload)
   const handleOverlay = () => {
     openOverlay();
-    setTimeout(loadPermissions, 1000);
   };
 
   const handleAccessibility = () => {
     openAccessibility();
-    setTimeout(loadPermissions, 1000);
   };
 
   const handleUsage = () => {
     openUsage();
-    setTimeout(loadPermissions, 1000);
   };
 
-  const handleNotification = async () => {
-    await requestNotifications();
-    loadPermissions();
-  };
+const handleNotification = async () => {
+  const isGranted = await checkNotifications();
+
+  if (isGranted) return;
+
+  const result = await requestNotifications();
+
+  // 🔥 If still not granted → user denied → open settings
+  const finalStatus = await checkNotifications();
+
+  if (!finalStatus) {
+    // 👉 Open app settings manually
+    Linking.openSettings();
+  }
+
+  loadPermissions();
+};
 
   return {
     permissions,
+    loading, // ✅ RETURN THIS
     handleOverlay,
     handleAccessibility,
     handleUsage,

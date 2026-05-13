@@ -1,8 +1,8 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    "types": ["jest"]
+    "types": ["jest","node"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "App.js", "src/layout/Container.js", "src/components/headers/MainHeader.js", "src/screens/home/Home.js", "src/screens/permission/AccessibilityPermission.js", "src/screens/app-list/AppsListScreen.js", "src/screens/blocking/BlockingConditionsScreen.js", "src/screens/blocking/QuickBlockScreen.js", "src/screens/blocking/ScheduleBlockScreen.js", "src/screens/settings/Settings.js", "src/utils/permissions.js", "src/screens/stats/Stats.js"],
+  "include": ["**/*.ts", "**/*.tsx", "App.js", "src/layout/Container.js", "src/components/headers/MainHeader.js", "src/screens/home/Home.js", "src/screens/permission/AccessibilityPermission.js", "src/screens/app-list/AppsListScreen.js", "src/screens/blocking/BlockingConditionsScreen.js", "src/screens/blocking/QuickBlockScreen.js", "src/screens/blocking/ScheduleBlockScreen.js", "src/screens/profile/Settings.js", "src/utils/permissions.js", "src/screens/stats/Stats.js", "src/screens/permission/OverlayPermission.js", "src/screens/subscription/SubscriptionScreen.js", "src/screens/notifications/NotificationSettingsScreen.js", "src/screens/help/FaqListScreen.js", "src/components/auth/GuestGate.js", "src/hooks/useGuestGuard.js", "src/hooks/useProtectedNavigation.js"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

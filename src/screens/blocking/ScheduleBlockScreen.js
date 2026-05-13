@@ -11,7 +11,7 @@ import Congratulation from '../../components/modals/Congratulation';
 import Container from '../../layout/Container';
 import { useTheme } from '../../context/theme/ThemeContext';
 import { useAppBlocker } from '../../context/AppBlockerContext';
-
+import Button from '../../components/buttons/Button';
 import { Fonts } from '../../utils/typography';
 import BackButton from '../../components/buttons/BackButton';
 import WheelColumn from '../../components/WheelColumn';
@@ -32,7 +32,12 @@ export default function ScheduleBlockScreen({ navigation, route }) {
   const state = useAppBlocker();
   const app = route.params?.app;
   const [showSuccess, setShowSuccess] = useState(false);
-  const [selectedDays, setSelectedDays] = useState(['Mon']);
+  const getToday = () => {
+    const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return daysMap[new Date().getDay()];
+  };
+
+  const [selectedDays, setSelectedDays] = useState([getToday()]);
   const [hour, setHour] = useState('00');
   const [minute, setMinute] = useState('00');
   const [second, setSecond] = useState('01');
@@ -62,8 +67,11 @@ export default function ScheduleBlockScreen({ navigation, route }) {
     // set timer
     state.setTimer(app.package, finalTime);
     state.saveSchedule(app.package, selectedDays);
-    state.saveApps([app.package]);
+    const updatedApps = state.selected.includes(app.package)
+      ? state.selected
+      : [...state.selected, app.package];
 
+    state.saveApps(updatedApps);
     setShowSuccess(true);
     navigation.goBack();
   };
@@ -184,23 +192,19 @@ export default function ScheduleBlockScreen({ navigation, route }) {
         </View>
 
         {/* SAVE */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: colors.accent, marginTop: 'auto' },
-          ]}
+        <Button
+          title="Save Schedule"
           onPress={handleSave}
-        >
-          <Text
-            style={{
-              color: colors.whitePrimary,
-              fontFamily: Fonts.primary_SemiBold,
-              fontSize: 15,
-            }}
-          >
-            Save Schedule
-          </Text>
-        </TouchableOpacity>
+          wrapperStyle={{ marginTop: 'auto' }}
+          buttonStyle={{
+            height: 50,
+            borderRadius: 14,
+          }}
+          labelStyle={{
+            fontSize: 15,
+            fontFamily: Fonts.primary_SemiBold,
+          }}
+        />
       </View>
       <Congratulation
         isVisible={showSuccess}
@@ -283,6 +287,4 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.primary_SemiBold,
     letterSpacing: 1,
   },
-
-  button: { padding: 14, borderRadius: 12, alignItems: 'center' },
 });

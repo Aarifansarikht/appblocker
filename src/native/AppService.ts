@@ -10,7 +10,7 @@ const isAndroid = Platform.OS === 'android';
 const AppService = {
   // 🔐 PERMISSIONS
   requestAccessibilityPermission: () => {
-    console.log('Requesting permissions...', { isIOS, isAndroid, ScreenTimeManager });
+   
     if (isAndroid) {
       AppLocker.openAccessibilitySettings();
     } else if (isIOS && ScreenTimeManager) {
@@ -18,7 +18,7 @@ const AppService = {
     }
   },
   requestOverlayPermission: () => {
-    console.log('Requesting permissions...', { isIOS, isAndroid, ScreenTimeManager });
+   
     if (isAndroid) {
       AppLocker.requestOverlayPermission();
     
@@ -41,6 +41,18 @@ const AppService = {
     }
     return [];
   },
+  getLockedApps: async () => {
+    if (isAndroid) {
+      return await AppLocker.getLockedApps();
+    }
+    return [];
+  },
+  getFullState: async () => {
+    if (isAndroid) {
+      return await AppLocker.getFullState();
+    }
+    return [];
+  },
 
   // 💾 SAVE LOCKED APPS (ANDROID)
   saveApps: (apps: string[]) => {
@@ -55,6 +67,8 @@ const AppService = {
       AppLocker.setAppTimer(pkg, time);
     }
   },
+ setLockRange: (pkg: string, fromSecs: number, toSecs: number) =>
+  NativeModules.AppLocker.setLockRange(pkg, fromSecs, toSecs),
 saveSchedule: (pkg: any, days: any) => {
   if (isAndroid) {
     AppLocker.saveSchedule(pkg, days);

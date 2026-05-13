@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import { useTheme } from '../context/theme/ThemeContext';
 import { Fonts } from '../utils/typography';
+import { SCREEN_WIDTH } from '../utils/constants';
 
 const ITEM_H = 48;
 const VISIBLE = 5;
@@ -120,7 +121,7 @@ export default function WheelColumn({ data, selected, onChange }) {
 
 const styles = StyleSheet.create({
   outer: {
-    width: 64,
+    width: SCREEN_WIDTH/9,
     height: ITEM_H * VISIBLE,
     overflow: 'hidden',
   },

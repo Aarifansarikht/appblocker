@@ -2,7 +2,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   HomeScreen,
   StatsScreen,
-  SettingsScreen
+  SettingsScreen,
+  ProfileScreen
 } from './routes';
 import { useTheme } from '../context/theme/ThemeContext';
 import {
@@ -15,13 +16,13 @@ import {
   ProfileOutlineIcon,
   StatesFillIcon
 } from '../utils/svg';
-const Tab = createBottomTabNavigator();
+const { Navigator, Screen } = createBottomTabNavigator()
 
 export default function BottomNavigation() {
   const { colors } = useTheme();
 
   return (
-    <Tab.Navigator
+    <Navigator
        screenOptions={{
         tabBarActiveTintColor: colors.tabActive,
         tabBarInactiveTintColor: colors.tabInactive,
@@ -32,7 +33,7 @@ export default function BottomNavigation() {
         }
       }}
     >
-      <Tab.Screen
+      <Screen
         name="Block"
         component={HomeScreen}
           options={{
@@ -44,7 +45,7 @@ export default function BottomNavigation() {
         }}
       />
 
-      <Tab.Screen
+      <Screen
         name="Stats"
         component={StatsScreen}
           options={{
@@ -56,9 +57,9 @@ export default function BottomNavigation() {
         }}
       />
 
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
+      <Screen
+        name="Profile"
+        component={ProfileScreen}
           options={{
           lazy: true,
           tabBarIcon: ({ focused, color, size }) => {
@@ -67,6 +68,6 @@ export default function BottomNavigation() {
           tabBarLabel: "Profile"
         }}
       />
-    </Tab.Navigator>
+    </Navigator>
   );
 }

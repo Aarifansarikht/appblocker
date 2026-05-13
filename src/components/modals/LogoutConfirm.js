@@ -9,7 +9,7 @@ import { Fonts } from '../../utils/typography'
 import { useNavigation } from '@react-navigation/native'
 import { Navigate_Login } from '../../routes/path'
 
-const LogoutConfirm = ({onClose, isVisible}) => {
+const LogoutConfirm = ({onClose, isVisible,onConfirm }) => {
     const { colors } = useTheme();
     const navigation  = useNavigation()
     return (
@@ -25,7 +25,7 @@ const LogoutConfirm = ({onClose, isVisible}) => {
                     }} onPress={onClose && onClose} />
                     <Button title='Logout' wrapperStyle={{
                         flex: 1
-                    }} onPress={() => navigation.navigate(Navigate_Login)}/>
+                    }} onPress={onConfirm}/>
                 </View>
             </View>
         </ModalLayout>

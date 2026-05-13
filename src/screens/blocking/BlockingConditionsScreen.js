@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Modal,
+  Alert,
 } from 'react-native';
 
 import Container from '../../layout/Container';
@@ -17,19 +18,46 @@ import { formatDays } from '../../helper/formatDays';
 import ClockIcon, { LockIcon } from '../../utils/svg';
 import { useAppBlocker } from '../../context/AppBlockerContext';
 import OrderConfirm from '../../components/modals/OrderConfirm';
+import Button from '../../components/buttons/Button';
+import usePermissions from '../../hooks/usePermissions';
+import { Navigate_Bottom, Navigate_Home } from '../../routes/path';
 export default function BlockingConditionsScreen({ navigation, route }) {
   const { colors } = useTheme();
   const state = useAppBlocker();
   const { app } = route.params;
   const appDays = state.days[app.package] || [];
-  const timer = state.timers[app.package] || 0;
+  const timer = state.timers?.[app.package] ?? 0;
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
-  // ✅ FIXED LOGIC
+  const { permissions } = usePermissions();
+  const hasAllPermissions = () => {
+    return (
+      permissions.overlay &&
+      permissions.accessibility &&
+      permissions.usage &&
+      permissions.notifications
+    );
+  };
   const isLocked = state.selected.includes(app.package);
   const isUnlocked = state.unlocked.includes(app.package);
   const [quickBlockVisible, setQuickBlockVisible] = useState(false);
-
+  const handlePermissionCheck = () => {
+    if (!hasAllPermissions()) {
+      Alert.alert(
+        'Permissions Required',
+        'Please enable all permissions to use blocking features.',
+        [
+          {
+            text: 'Go to Permissions',
+            onPress: () => navigation.navigate(Navigate_Bottom),
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+      );
+      return false;
+    }
+    return true;
+  };
   const formatTime = sec => {
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
@@ -49,20 +77,29 @@ export default function BlockingConditionsScreen({ navigation, route }) {
     }, 1500);
   };
   const confirmQuickBlock = () => {
-    // ensure selected
-    if (!state.selected.includes(app.package)) {
-      state.toggleApp(app.package);
-    }
+    const pkg = app.package;
 
-    // 🔥 IMPORTANT: set timer = 0 (instant lock)
-    state.setTimer(app.package, 0);
-    const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    // 🔥 FULL RESET BEFORE BLOCK
+    state.unlockApp(pkg); // reset everything
 
-    state.saveSchedule(app.package, ALL_DAYS);
+    setTimeout(() => {
+      if (!state.selected.includes(pkg)) {
+        state.toggleApp(pkg);
+      }
 
-    // save + relock
-    state.saveApps([app.package]);
-    state.relockApp(app.package);
+      state.setTimer(pkg, 0);
+
+      const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      state.saveSchedule(pkg, ALL_DAYS);
+
+      const updatedApps = state.selected.includes(pkg)
+        ? state.selected
+        : [...state.selected, pkg];
+
+      state.saveApps(updatedApps);
+
+      state.relockApp(pkg);
+    }, 100); // small delay ensures clean state
 
     setQuickBlockVisible(false);
   };
@@ -107,10 +144,7 @@ export default function BlockingConditionsScreen({ navigation, route }) {
         >
           <View style={styles.blockHeader}>
             <View
-              style={[
-                styles.iconCircle,
-                { backgroundColor: colors.blackPrimary },
-              ]}
+              style={[styles.iconCircle, { backgroundColor: colors.accent }]}
             >
               <ClockIcon color={colors.whitePrimary} size={18} />
             </View>
@@ -169,7 +203,10 @@ export default function BlockingConditionsScreen({ navigation, route }) {
         >
           <TouchableOpacity
             style={styles.item}
-            onPress={() => setQuickBlockVisible(true)}
+            onPress={() => {
+              if (!handlePermissionCheck()) return;
+              setQuickBlockVisible(true);
+            }}
           >
             <View style={styles.left}>
               <View
@@ -198,7 +235,10 @@ export default function BlockingConditionsScreen({ navigation, route }) {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => navigation.navigate('ScheduleBlockScreen', { app })}
+            onPress={() => {
+              if (!handlePermissionCheck()) return;
+              navigation.navigate('ScheduleBlockScreen', { app });
+            }}
           >
             <View style={styles.left}>
               <View
@@ -212,7 +252,7 @@ export default function BlockingConditionsScreen({ navigation, route }) {
 
               <View>
                 <Text style={[styles.title, { color: colors.blackPrimary }]}>
-                  Specific Time Intervals
+                  Specific Time
                 </Text>
                 <Text
                   style={[styles.subtitle, { color: colors.paragraphLight }]}
@@ -224,8 +264,6 @@ export default function BlockingConditionsScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ FIXED BUTTON */}
-        {/* ✅ FIXED BOTTOM BUTTON WITH SPACING */}
         {isLocked && !isUnlocked && (
           <View
             style={[
@@ -236,13 +274,19 @@ export default function BlockingConditionsScreen({ navigation, route }) {
               },
             ]}
           >
-            <TouchableOpacity
+            <Button
+              title="Unlock App"
               onPress={handleUnlock}
-              activeOpacity={0.8}
-              style={[styles.bottomButton, { backgroundColor: colors.accent }]}
-            >
-              <Text style={styles.bottomButtonText}>Unlock App</Text>
-            </TouchableOpacity>
+              wrapperStyle={{ marginTop: 'auto' }}
+              buttonStyle={{
+                height: 50,
+                borderRadius: 14,
+              }}
+              labelStyle={{
+                fontSize: 15,
+                fontFamily: Fonts.primary_SemiBold,
+              }}
+            />
           </View>
         )}
 

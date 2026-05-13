@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  InteractionManager,
+  Text,
 } from 'react-native';
 
 import Container from '../../layout/Container';
@@ -16,27 +18,46 @@ import { Fonts } from '../../utils/typography';
 import { CONTAINER_SPACING } from '../../utils/constants';
 import BackButton from '../../components/buttons/BackButton';
 import { LockIcon } from '../../utils/svg';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AppsListScreen() {
   const { colors } = useTheme();
   const state = useAppBlocker();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+
+  const [ready, setReady] = useState(false);
+
+  //  Refresh state when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      state.refreshState();
+    }, [])
+  );
+
+  //  Delay rendering for smooth UI
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setReady(true);
+    });
+    return () => task.cancel();
+  }, []);
+
   const renderItem = ({ item, index }) => {
-    const isBlocked = state.isBlocking;
-    const isLocked = state.selected.includes(item.package);
-    const timer = state.timers[item.package] || 10;
-    console.log('isBlocked', isBlocked);
+    const isSelected = state.selected.includes(item.package);
+    const isLocked = isSelected && state.lockedNow.includes(item.package);
+
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => {
+        onPress={() =>
           navigation.navigate('BlockingConditions', {
             app: item,
             isLocked,
-            timer
-          });
-        }}
+            timer: state.timers?.[item.package] ?? 0,
+          })
+        }
         style={[
           styles.item,
           {
@@ -71,19 +92,14 @@ export default function AppsListScreen() {
           style={[
             styles.statusIcon,
             {
-              backgroundColor:
-                isLocked && !state.unlocked.includes(item.package)
-                  ? 'rgba(11,218,81,0.15)'
-                  : colors.placeholder,
+              backgroundColor: isLocked
+                ? 'rgba(11,218,81,0.15)'
+                : colors.placeholder,
             },
           ]}
         >
           <LockIcon
-            color={
-              isLocked && !state.unlocked.includes(item.package)
-                ? 'rgb(11,218,81)'
-                : colors.paragraphLight
-            }
+            color={isLocked ? 'rgb(11,218,81)' : colors.paragraphLight}
             size={18}
           />
         </View>
@@ -93,8 +109,7 @@ export default function AppsListScreen() {
 
   return (
     <Container>
-      <View style={{ flex: 1 }}>
-        {/* HEADER */}
+      <View style={{ flex: 1, paddingBottom: insets.bottom + 60 }}>
         <View style={{ paddingHorizontal: CONTAINER_SPACING }}>
           <BackButton
             title="Blocked Apps"
@@ -102,7 +117,6 @@ export default function AppsListScreen() {
           />
         </View>
 
-        {/* LIST CONTAINER (LIKE QUICK ACTIONS) */}
         <View
           style={[
             styles.container,
@@ -112,19 +126,27 @@ export default function AppsListScreen() {
             },
           ]}
         >
-          <FlatList
-            data={state.apps}
-            keyExtractor={item => item.package}
-            renderItem={renderItem}
-            showsVerticalScrollIndicator={false}
-          />
+          {!ready ? (
+            <View style={styles.loader}>
+              <ActivityIndicator size={24} color={colors.accent} />
+            </View>
+          ) : (
+            <FlatList
+              data={state.apps}
+              keyExtractor={item => item.package}
+              renderItem={renderItem}
+              showsVerticalScrollIndicator={false}
+              initialNumToRender={10}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              removeClippedSubviews
+            />
+          )}
         </View>
       </View>
     </Container>
   );
 }
-
-/* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
   container: {
@@ -171,6 +193,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  loader: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

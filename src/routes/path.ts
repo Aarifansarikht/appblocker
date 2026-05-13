@@ -1,17 +1,33 @@
 export const Navigate_OnBoarding = 'on-boarding';
-
+export const Navigate_Login = "login";
+export const Navigate_Login_With_ID = "login-with-id-password";
+export const Navigate_Register = "register";
+export const Navigate_ForgotPassword = 'forgot-password';
+export const Navigate_ResetPassword = 'reset-password';
+export const Navigate_OTP_Verification = "otp-verification"
 
 // MAIN
-export const Navigate_Bottom = 'bottom';
+export const Navigate_Bottom = 'bottom-navigation';
 export const Navigate_Home = 'home';
 export const Navigate_App_Detail = 'app-detail';
 export const Navigate_Stats = 'stats';
-export const Navigate_Settings = 'settings';
+export const Navigate_Profile = 'profile';
 export const Navigate_Permission = 'permission';
 export const Navigate_Accessibility = "accessibility-permission";
 export const Navigate_Overlay = "overlay-permission";
+export const Navigate_Usage = "usage-permission";
 export const Navigate_Apps_List = 'AppsList';
 export const Navigate_Blocking_Conditions = 'BlockingConditions';
 export const Navigate_Quick_Block = 'QuickBlockScreen';
 export const Navigate_Schedule_Block = 'ScheduleBlockScreen';
 export const Navigate_Learning = 'LearningScreen';
+export const Navigate_Edit_Profile = "edit-profile";
+export const Navigate_Notification_Settings = "notification-settings";
+export const Navigate_Subscription = "subscription";
+export const Navigate_Help_Home = "help-home";  
+export const Navigate_Faq_List = "faq-list";
+export const Navigate_Faq_Detail = "faq-detail";
+export const Navigate_blockScreen_Settings = "blockScreen-settings";
+export const Navigate_reward = "reward-screen";
+export const Navigate_changePassword = "change-password";
+export const Navigate_notification = "notification-screen";
